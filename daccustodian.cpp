@@ -43,8 +43,8 @@ extern "C" { \
 EOSIO_ABI_EX(daccustodian,
              (updateconfig)
              (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
-             (updatebio)(updatereqpay)
-             (votecust)/*(voteproxy)*/
+             (updatebio)
+             (votecust)
              (newperiod)
              (claimpay)
              (transfer)

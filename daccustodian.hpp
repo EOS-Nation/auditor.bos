@@ -13,7 +13,7 @@
 #endif
 
 #ifndef TOKEN_CONTRACT
-#define TOKEN_CONTRACT "eosdactokens"
+#define TOKEN_CONTRACT "eosio.token"
 #endif
 
 #ifndef TRANSFER_DELAY
@@ -31,6 +31,10 @@ using namespace std;
 struct [[eosio::table("config"), eosio::contract("daccustodian")]] contr_config {
 //    The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
+
+//    NEW: The pay allocated for each custodian per period
+    asset custpay;
+
 //    The maximum number of votes that each member can make for a candidate.
     uint8_t maxvotes = 5;
 //    Number of custodians to be elected for each election count.
@@ -42,7 +46,7 @@ struct [[eosio::table("config"), eosio::contract("daccustodian")]] contr_config 
     name authaccount = name{0};
 
     // The contract that holds the fund for the DAC. This is used as the source for custodian pay.
-    name tokenholder = "eosdacthedac"_n;
+    name tokenholder = "eosdacthedac"_n; //TODO: Update this to BOS designated account
 
     // The contract that will act as the service provider account for the dac. This is used as the source for custodian pay.
     name serviceprovider;
@@ -111,7 +115,7 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
 
 struct [[eosio::table("candidates"), eosio::contract("daccustodian")]] candidate {
     name candidate_name;
-    asset requestedpay;
+    asset requestedpay; //unused
     asset locked_tokens;
     uint64_t total_votes;
     uint8_t is_active;
@@ -138,7 +142,7 @@ typedef multi_index<"candidates"_n, candidate,
 
 struct [[eosio::table("custodians"), eosio::contract("daccustodian")]] custodian {
     name cust_name;
-    asset requestedpay;
+    asset requestedpay; //unused
     uint64_t total_votes;
 
     uint64_t primary_key() const { return cust_name.value; }
@@ -442,8 +446,6 @@ private: // Private helper methods used by other actions.
     void assertPeriodTime();
 
     void distributePay();
-    
-    void distributeMeanPay();
 
     void setCustodianAuths();
 

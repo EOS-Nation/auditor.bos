@@ -1,13 +1,7 @@
 
 
-    void daccustodian::nominatecand(name cand, asset requestedpay) {
+    void daccustodian::nominatecand(name cand) {
     require_auth(cand);
-    assertValidMember(cand);
-
-    eosio_assert(requestedpay.amount >= 0, "ERR::UPDATEREQPAY_UNDER_ZERO::Requested pay amount must not be negative.");
-    // This implicitly asserts that the symbol of requestedpay matches the configs.max pay.
-    eosio_assert(requestedpay <= configs().requested_pay_max,
-                 "ERR::NOMINATECAND_PAY_LIMIT_EXCEEDED::Requested pay limit for a candidate was exceeded.");
 
     _currentState.number_active_candidates++;
 
@@ -19,8 +13,8 @@
         eosio_assert(!reg_candidate->is_active, "ERR::NOMINATECAND_ALREADY_REGISTERED::Candidate is already registered and active.");
         registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
             c.is_active = 1;
-            c.requestedpay = requestedpay;
-
+            c.requestedpay = configs().custpay;
+            
             if (pending != pendingstake.end()) {
                 c.locked_tokens += pending->quantity;
                 pendingstake.erase(pending);
@@ -34,7 +28,7 @@
 
         registered_candidates.emplace(cand, [&](candidate &c) {
             c.candidate_name = cand;
-            c.requestedpay = requestedpay;
+            c.requestedpay = configs().custpay;
             c.locked_tokens = pending->quantity;
             c.total_votes = 0;
             c.is_active = 1;

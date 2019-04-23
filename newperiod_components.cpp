@@ -2,17 +2,7 @@
 void daccustodian::distributePay() {
     custodians_table custodians(_self, _self.value);
 
-    //Find the median pay using a temporary vector to hold the requestedpay amounts.
-    std::vector<asset> reqpays;
-    for (auto cust: custodians) {
-        reqpays.push_back(cust.requestedpay);
-    }
-
-    // Using nth_element to just sort for the entry we need for the median value.
-    size_t mid = reqpays.size() / 2;
-    std::nth_element(reqpays.begin(), reqpays.begin() + mid, reqpays.end());
-
-    asset medianAsset = reqpays[mid];
+    //TODO: GET FIXED PAY RATE FROM CONFIG
 
     if (medianAsset.amount > 0) {
         for (auto cust: custodians) {
@@ -28,34 +18,6 @@ void daccustodian::distributePay() {
     print("distribute pay");
 }
 
-void daccustodian::distributeMeanPay() {
-    custodians_table custodians(_self, _self.value);
-
-    //Find the mean pay using a temporary vector to hold the requestedpay amounts.
-    asset total = asset{0, configs().requested_pay_max.symbol};
-    int64_t count = 0;
-    for (auto cust: custodians) {
-        total += cust.requestedpay;
-        count += 1;
-        // print_f("cust % with amount %\n", cust.cust_name, cust.requestedpay);
-    }
-
-    asset meanAsset = count == 0 ? total : total / count;
-
-    // print_f("Calclulated mean is: %", meanAsset);
-    if (meanAsset.amount > 0) {
-        for (auto cust: custodians) {
-            pending_pay.emplace(_self, [&](pay &p) {
-                p.key = pending_pay.available_primary_key();
-                p.receiver = cust.cust_name;
-                p.quantity = meanAsset;
-                p.memo = "Custodian pay. Thank you.";
-            });
-        }
-    }
-
-    print("distribute mean pay");
-}
 
 void daccustodian::assertPeriodTime() {
     uint32_t timestamp = now();
@@ -225,7 +187,7 @@ void daccustodian::newperiod(string message) {
                  "ERR::NEWPERIOD_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
 
     // Distribute pay to the current custodians.
-    distributeMeanPay();
+    distributePay();
 
     // Set custodians for the next period.
     allocateCustodians(false);
