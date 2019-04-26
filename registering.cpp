@@ -1,6 +1,6 @@
 
 
-    void daccustodian::nominatecand(name cand) {
+void daccustodian::nominatecand(name cand) {
     require_auth(cand);
 
     _currentState.number_active_candidates++;
@@ -14,7 +14,7 @@
         registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
             c.is_active = 1;
             c.requestedpay = configs().custpay;
-            
+
             if (pending != pendingstake.end()) {
                 c.locked_tokens += pending->quantity;
                 pendingstake.erase(pending);

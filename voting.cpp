@@ -14,27 +14,21 @@ void daccustodian::votecust(name voter, vector<name> newvotes) {
         eosio_assert(candidate.is_active, "ERR::VOTECUST_VOTING_FOR_INACTIVE_CAND::Attempting to vote for an inactive candidate.");
     }
 
+    modifyVoteWeights(voter, newvotes);
+}
+
+
+void daccustodian::refreshvote(name voter) {
+    if (configs().authaccount == name{0}) {
+        require_auth(_self);
+    } else {
+        require_auth(configs().authaccount);
+    }
+
     // Find a vote that has been cast by this voter previously.
     auto existingVote = votes_cast_by_members.find(voter.value);
     if (existingVote != votes_cast_by_members.end()) {
-        modifyVoteWeights(voter, existingVote->candidates, newvotes);
-
-        if (newvotes.size() == 0) {
-            // Remove the vote if the array of candidates is empty
-            votes_cast_by_members.erase(existingVote);
-            eosio::print("\n Removing empty vote.");
-        } else {
-            votes_cast_by_members.modify(existingVote, voter, [&](vote &v) {
-                v.candidates = newvotes;
-                v.proxy = name();
-            });
-        }
-    } else {
-        modifyVoteWeights(voter, {}, newvotes);
-
-        votes_cast_by_members.emplace(voter, [&](vote &v) {
-            v.voter = voter;
-            v.candidates = newvotes;
-        });
-    }
+        //new votes is same as old votes, will just apply the deltas
+        modifyVoteWeights(voter, existingVote->candidates);
+    } 
 }

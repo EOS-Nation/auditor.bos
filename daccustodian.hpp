@@ -46,7 +46,7 @@ struct [[eosio::table("config"), eosio::contract("daccustodian")]] contr_config 
     name authaccount = name{0};
 
     // The contract that holds the fund for the DAC. This is used as the source for custodian pay.
-    name tokenholder = "eosdacthedac"_n; //TODO: Update this to BOS designated account
+    name tokenholder = "bosauditfund"_n; //TODO: Update this to BOS designated account
 
     // The contract that will act as the service provider account for the dac. This is used as the source for custodian pay.
     name serviceprovider;
@@ -163,6 +163,7 @@ typedef multi_index<"custodians"_n, custodian,
 struct [[eosio::table("votes"), eosio::contract("daccustodian")]] vote {
     name voter;
     name proxy;
+    uint64_t weight;
     std::vector<name> candidates;
 
     uint64_t primary_key() const { return voter.value; }
@@ -268,7 +269,7 @@ public:
  * ### Post Condition:
  * The candidate should be present in the candidates table and be set to active. If they are a returning candidate they should be set to active again. The `locked_tokens` value should reflect the total of the tokens they have transferred to the contract for staking. The number of active candidates in the contract will incremented.
  */
-    ACTION nominatecand(name cand, eosio::asset requestedpay);
+    ACTION nominatecand(name cand);
 
     /**
  * This action is used to withdraw a candidate from being active for custodian elections.
@@ -341,7 +342,6 @@ public:
 Nothing from this action is stored on the blockchain. It is only intended to ensure authentication of changing the bio which will be stored off chain.
  */
     ACTION updatebio(name cand, std::string bio);
-
     [[eosio::action]]
     inline void stprofile(name cand, std::string profile) { require_auth(cand); };
 
@@ -362,7 +362,7 @@ Nothing from this action is stored on the blockchain. It is only intended to ens
  * ### Post Condition:
  * The requested pay for the candidate should be updated to the new asset.
  */
-    ACTION updatereqpay(name cand, eosio::asset requestedpay);
+    //ACTION updatereqpay(name cand, eosio::asset requestedpay);
 
     /**
 * This action is to facilitate voting for candidates to become custodians of the DAC. Each member will be able to vote a configurable number of custodians set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
@@ -380,6 +380,7 @@ Nothing from this action is stored on the blockchain. It is only intended to ens
 * An active vote record for the voter will have been created or modified to reflect the newvotes. Each of the candidates will have their total_votes amount updated to reflect the delta in voter's token balance. Eg. If a voter has 1000 tokens and votes for 5 candidates, each of those candidates will have their total_votes value increased by 1000. Then if they change their votes to now vote 2 different candidates while keeping the other 3 the same there would be a change of -1000 for 2 old candidates +1000 for 2 new candidates and the other 3 will remain unchanged.
 */
     ACTION votecust(name voter, std::vector<name> newvotes);
+    ACTION refreshvote(name voter);
 
 //    void voteproxy(name voter, name proxy);
 
@@ -435,13 +436,11 @@ private: // Private helper methods used by other actions.
 
     contr_config configs();
 
-    void assertValidMember(name member);
-
     void updateVoteWeight(name custodian, int64_t weight);
 
     void updateVoteWeights(const vector<name> &votes, int64_t vote_weight);
 
-    void modifyVoteWeights(name voter, vector<name> oldVotes, vector<name> newVotes);
+    void modifyVoteWeights(name voter, vector<name> newVotes);
 
     void assertPeriodTime();
 

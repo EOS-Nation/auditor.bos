@@ -5,17 +5,6 @@ contr_config daccustodian::configs() {
     return conf;
 }
 
-void daccustodian::assertValidMember(name member) {
-    name tokenContract = name(TOKEN_CONTRACT);
-    regmembers reg_members(tokenContract, tokenContract.value);
-    memterms memberterms(tokenContract, tokenContract.value);
-
-    const auto &regmem = reg_members.get(member.value, "ERR::GENERAL_REG_MEMBER_NOT_FOUND::Account is not registered with members.");
-    eosio_assert((regmem.agreedterms != 0), "ERR::GENERAL_MEMBER_HAS_NOT_AGREED_TO_ANY_TERMS::Account has not agreed to any terms");
-    auto latest_member_terms = (--memberterms.end());
-    eosio_assert(latest_member_terms->version == regmem.agreedterms, "ERR::GENERAL_MEMBER_HAS_NOT_AGREED_TO_LATEST_TERMS::Agreed terms isn't the latest.");
-}
-
 void daccustodian::updateVoteWeight(name custodian, int64_t weight) {
     if (weight == 0) {
         print("\n Vote has no weight - No need to continue.");
@@ -41,20 +30,57 @@ void daccustodian::updateVoteWeights(const vector<name> &votes, int64_t vote_wei
     _currentState.total_votes_on_candidates += votes.size() * vote_weight;
 }
 
-void daccustodian::modifyVoteWeights(name voter, vector<name> oldVotes, vector<name> newVotes) {
+void daccustodian::modifyVoteWeights(name voter, vector<name> newVotes) {
     // This could be optimised with set diffing to avoid remove then add for unchanged votes. - later
     eosio::print("Modify vote weights: ", voter, "\n");
 
     uint64_t asset_name = configs().lockupasset.symbol.code().raw();
+    int64_t vote_weight = 0; //ac->balance.amount;
+    int64_t old_weight = 0;
+    vector<name> oldVotes = {};
 
-    accounts accountstable(name(TOKEN_CONTRACT), voter.value);
-    const auto ac = accountstable.find(asset_name);
-    if (ac == accountstable.end()) {
-        print("Voter has no balance therefore no need to update vote weights");
-        return;
+    //Find all cases of delegated bandwidth and sum them up
+    del_bandwidth_table delband(name("eosio"), voter.value);
+    auto stake = delband.begin();
+
+    while(stake != delband.end()) {
+        vote_weight += stake->net_weight.amount;
+        vote_weight += stake->cpu_weight.amount;
+        stake++;
     }
 
-    int64_t vote_weight = ac->balance.amount;
+    //Add any liquid balance
+    accounts accountstable(name(TOKEN_CONTRACT), voter.value);
+    const auto ac = accountstable.find(asset_name);
+    if (ac != accountstable.end()) {
+        vote_weight += ac->balance.amount;
+    }    
+
+    // Find a vote that has been cast by this voter previously.
+    auto existingVote = votes_cast_by_members.find(voter.value);
+    if (existingVote != votes_cast_by_members.end()) {
+
+        old_weight = existingVote->weight; //fetch the old weight
+        oldVotes = existingVote->candidates; //fetch the original candidates
+
+        if (newVotes.size() == 0) {
+            // Remove the vote if the array of candidates is empty
+            votes_cast_by_members.erase(existingVote);
+            eosio::print("\n Removing empty vote.");
+        } else {
+            votes_cast_by_members.modify(existingVote, voter, [&](vote &v) {
+                v.candidates = newVotes;
+                v.proxy = name();
+                v.weight = vote_weight;
+            });
+        }
+    } else {
+        votes_cast_by_members.emplace(voter, [&](vote &v) {
+            v.voter = voter;
+            v.candidates = newVotes;
+            v.weight = vote_weight;
+        });
+    }
 
     // New voter -> Add the tokens to the total weight.
     if (oldVotes.size() == 0)
@@ -62,8 +88,9 @@ void daccustodian::modifyVoteWeights(name voter, vector<name> oldVotes, vector<n
 
     // Leaving voter -> Remove the tokens to the total weight.
     if (newVotes.size() == 0)
-        _currentState.total_weight_of_votes -= vote_weight;
+        _currentState.total_weight_of_votes -= old_weight;
 
-    updateVoteWeights(oldVotes, -vote_weight);
-    updateVoteWeights(newVotes, vote_weight);
+    updateVoteWeights(oldVotes, -old_weight); //remove old weights
+    updateVoteWeights(newVotes, vote_weight); //add new weights
 }
+

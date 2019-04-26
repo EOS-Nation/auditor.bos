@@ -43,12 +43,11 @@ extern "C" { \
 EOSIO_ABI_EX(daccustodian,
              (updateconfig)
              (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
-             (updatebio)
-             (votecust)
+             (updatebio)(stprofile)(stprofileuns)
+             (votecust)(refreshvote)
              (newperiod)
              (claimpay)
              (transfer)
-             (stprofile)(stprofileuns)
 #ifdef MIGRATE
              (migrate)
 #endif

@@ -1,8 +1,7 @@
 
 void daccustodian::distributePay() {
     custodians_table custodians(_self, _self.value);
-
-    //TODO: GET FIXED PAY RATE FROM CONFIG
+    auto medianAsset = configs().custpay;
 
     if (medianAsset.amount > 0) {
         for (auto cust: custodians) {
@@ -163,7 +162,7 @@ void daccustodian::newperiod(string message) {
 
     contr_config config = configs();
 
-    // Get the max supply of the lockup asset token (eg. EOSDAC)
+    // Get the max supply of the lockup asset token (eg. BOS)
     auto tokenStats = stats(name(TOKEN_CONTRACT), config.lockupasset.symbol.code().raw()).begin();
     uint64_t max_supply = tokenStats->supply.amount;
 
@@ -171,16 +170,16 @@ void daccustodian::newperiod(string message) {
             double(_currentState.total_weight_of_votes) / double(max_supply) * 100.0;
 
     eosio::print("\n\nToken max supply: ", max_supply, " total votes so far: ", _currentState.total_weight_of_votes);
-    eosio::print("\n\nNeed inital engagement of: ", config.initial_vote_quorum_percent, "% to start the DAC.");
+    eosio::print("\n\nNeed inital engagement of: ", config.initial_vote_quorum_percent, "% to start the Audit Cycle.");
     eosio::print("\n\nToken supply: ", max_supply * 0.0001, " total votes so far: ", _currentState.total_weight_of_votes * 0.0001);
-    eosio::print("\n\nNeed initial engagement of: ", config.initial_vote_quorum_percent, "% to start the DAC.");
+    eosio::print("\n\nNeed initial engagement of: ", config.initial_vote_quorum_percent, "% to start the Audit Cycle..");
     eosio::print("\n\nNeed ongoing engagement of: ", config.vote_quorum_percent,
                  "% to allow new periods to trigger after initial activation.");
     eosio::print("\n\nPercent of current voter engagement: ", percent_of_current_voter_engagement, "\n\n");
 
     eosio_assert(_currentState.met_initial_votes_threshold == true ||
                  percent_of_current_voter_engagement > config.initial_vote_quorum_percent,
-                 "ERR::NEWPERIOD_VOTER_ENGAGEMENT_LOW_ACTIVATE::Voter engagement is insufficient to activate the DAC.");
+                 "ERR::NEWPERIOD_VOTER_ENGAGEMENT_LOW_ACTIVATE::Voter engagement is insufficient to activate the Audit Cycle..");
     _currentState.met_initial_votes_threshold = true;
 
     eosio_assert(percent_of_current_voter_engagement > config.vote_quorum_percent,
