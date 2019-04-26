@@ -30,7 +30,7 @@ TEST_ACTIVE_PUBLIC_KEY = 'EOS7rjn3r52PYd2ppkVEKYvy6oRDP9MZsJUPB2MStrak8LS36pnTZ'
 CONTRACT_NAME = 'daccustodian'
 ACCOUNT_NAME = 'daccustodian'
 
-CONTRACTS_DIR = 'tests/dependencies'
+CONTRACTS_DIR = 'dependencies'
 
 def configure_wallet
   beforescript = <<~SHELL
@@ -145,14 +145,14 @@ def install_contracts
 
    cleos set account permission #{ACCOUNT_NAME} active '{"threshold": 1,"keys": [{"key": "#{CONTRACT_ACTIVE_PUBLIC_KEY}","weight": 1}],"accounts": [{"permission":{"actor":"daccustodian","permission":"eosio.code"},"weight":1}]}' owner -p #{ACCOUNT_NAME}
 
-   source output/unit_tests/compile.sh
-   if [[ $? != 0 ]] 
-     then 
-     echo "failed to compile contract" 
-     exit 1
-   fi
+  #  source output/unit_tests/compile.sh
+  #  if [[ $? != 0 ]] 
+  #    then 
+  #    echo "failed to compile contract" 
+  #    exit 1
+  #  fi
    # cd ..
-   cleos set contract #{ACCOUNT_NAME} output/unit_tests/#{CONTRACT_NAME}
+   cleos set contract #{ACCOUNT_NAME} ../output/unit_tests/#{CONTRACT_NAME} #{CONTRACT_NAME}.wasm #{CONTRACT_NAME}.abi
    
    echo ""
    echo ""
@@ -163,11 +163,11 @@ def install_contracts
    echo ""
    echo ""
    echo "Set up the eosdactokens contract"
-   cleos set contract eosdactokens tests/dependencies/eosdactokens -p eosdactokens
+   cleos set contract eosdactokens dependencies/eosdactokens -p eosdactokens
 
    # Set the token contract to refer to this contract
    cleos push action eosdactokens updateconfig '["daccustodian"]' -p eosdactokens 
-   cd ../#{CONTRACT_NAME}
+   #cd ../#{CONTRACT_NAME}
 
   SHELL
 
@@ -175,9 +175,6 @@ def install_contracts
   exit() unless $? == 0
 end
 
-def killchain
-  # `sleep 0.5; kill \`pgrep nodeos\``
-end
 
 # Configure the initial state for the contracts for elements that are assumed to work from other contracts already.
 def configure_contracts
@@ -202,15 +199,10 @@ end
 
 describe "eosdacelect" do
   before(:all) do
-    reset_chain
     configure_wallet
     seed_system_contracts
     install_contracts
     configure_contracts
-  end
-
-  after(:all) do
-    killchain
   end
 
   describe "updateconfig" do
