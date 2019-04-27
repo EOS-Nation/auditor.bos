@@ -54,7 +54,7 @@ void daccustodian::modifyVoteWeights(name voter, vector<name> newVotes) {
     const auto ac = accountstable.find(asset_name);
     if (ac != accountstable.end()) {
         vote_weight += ac->balance.amount;
-    }    
+    }
 
     // Find a vote that has been cast by this voter previously.
     auto existingVote = votes_cast_by_members.find(voter.value);

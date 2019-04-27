@@ -24,8 +24,8 @@ struct currency_stats {
 typedef eosio::multi_index<"stat"_n, currency_stats> stats;
 
 /**
-*  Every user 'from' has a scope/table that uses every receipient 'to' as the primary key.
-*/
+ * Every user 'from' has a scope/table that uses every receipient 'to' as the primary key.
+ */
 struct delegated_bandwidth {
     name          from;
     name          to;
