@@ -19,3 +19,5 @@ node_modules
 .idea
 cmake-build-release
 .vscode
+*.abi
+*.wasm

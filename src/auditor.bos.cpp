@@ -6,7 +6,7 @@
 #include <eosiolib/multi_index.hpp>
 #include <eosiolib/public_key.hpp>
 #include <string>
-#include "daccustodian.hpp"
+#include "auditor.bos/auditor.bos.hpp"
 
 #include "update_member_details.cpp"
 #include "registering.cpp"
