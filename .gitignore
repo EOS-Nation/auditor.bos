@@ -1,23 +1,36 @@
-CMakeFiles/daccustodian.dir
-CMakeFiles/daccustodian.tmp.dir
-CMakeFiles/CMakeDirectoryInformation.cmake
-CMakeFiles/progress.marks
-CMakeFiles
-cmake_install.cmake
+# Prerequisites
+*.d
 
-tests/\.idea/
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-tests/\.DS_Store
+# Precompiled Headers
+*.gch
+*.pch
 
-daccustodian\.abi\.hpp
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
 
-\.DS_Store
+# Fortran module files
+*.mod
+*.smod
 
-Project\.build/
-Makefile
-node_modules
-.idea
-cmake-build-release
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+build/*
+.DS_Store
 .vscode
-*.abi
-*.wasm
