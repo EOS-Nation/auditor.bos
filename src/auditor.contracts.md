@@ -207,3 +207,13 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 **INTENT:** The intent of {{ claimpay }} is to allow an account to claim pending payment amounts due to the account. The pay claim they are claiming needs to be visible in the `pendingpay` table. Transfers to the claimer via an inline transfer on the `eosio.token` contract and then removes the pending payment record from the `pending_pay` table. The active auth of this claimer is required to complete this action.
 
 **TERM:** This action lasts for the duration of the time taken to process the transaction.
+
+<h1 class="contract">
+refreshvote
+</h1>
+
+## ACTION: refreshvote
+**PARAMETERS:**
+* __voter__ is an eosio account name.
+
+**INTENT** The intent of refreshvote is to update the auditor's vote weight
