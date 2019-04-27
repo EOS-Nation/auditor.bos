@@ -18,3 +18,4 @@ Makefile
 node_modules
 .idea
 cmake-build-release
+.vscode
