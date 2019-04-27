@@ -1,6 +1,6 @@
 
 
-void daccustodian::nominatecand(name cand) {
+void auditor::nominatecand(name cand) {
     require_auth(cand);
 
     _currentState.number_active_candidates++;
@@ -37,17 +37,17 @@ void daccustodian::nominatecand(name cand) {
     }
 }
 
-void daccustodian::withdrawcand(name cand) {
+void auditor::withdrawcand(name cand) {
     require_auth(cand);
     removeCandidate(cand, false);
 }
 
-void daccustodian::firecand(name cand, bool lockupStake) {
+void auditor::firecand(name cand, bool lockupStake) {
     require_auth(configs().authaccount);
     removeCandidate(cand, lockupStake);
 }
 
-void daccustodian::unstake(name cand) {
+void auditor::unstake(name cand) {
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::UNSTAKE_CAND_NOT_REGISTERED::Candidate is not already registered.");
     eosio_assert(!reg_candidate.is_active, "ERR::UNSTAKE_CANNOT_UNSTAKE_FROM_ACTIVE_CAND::Cannot unstake tokens for an active candidate. Call withdrawcand first.");
 
@@ -74,19 +74,19 @@ void daccustodian::unstake(name cand) {
     });
 }
 
-void daccustodian::resigncust(name cust) {
+void auditor::resigncust(name cust) {
     require_auth(cust);
     removeCustodian(cust);
 }
 
-void daccustodian::firecust(name cust) {
+void auditor::firecust(name cust) {
     require_auth(configs().authaccount);
     removeCustodian(cust);
 }
 
 // private methods for the above actions
 
-void daccustodian::removeCustodian(name cust) {
+void auditor::removeCustodian(name cust) {
 
     custodians_table custodians(_self, _self.value);
     auto elected = custodians.find(cust.value);
@@ -105,7 +105,7 @@ void daccustodian::removeCustodian(name cust) {
     setCustodianAuths();
 }
 
-void daccustodian::removeCandidate(name cand, bool lockupStake) {
+void auditor::removeCandidate(name cand, bool lockupStake) {
     _currentState.number_active_candidates--;
 
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::REMOVECANDIDATE_NOT_CURRENT_CANDIDATE::Candidate is not already registered.");

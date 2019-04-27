@@ -1,5 +1,5 @@
 
-void daccustodian::transfer(name from,
+void auditor::transfer(name from,
                             name to,
                             asset quantity,
                             string memo) {

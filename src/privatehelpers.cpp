@@ -1,11 +1,11 @@
 
-contr_config daccustodian::configs() {
+contr_config auditor::configs() {
     contr_config conf = config_singleton.get_or_default(contr_config());
     config_singleton.set(conf, _self);
     return conf;
 }
 
-void daccustodian::updateVoteWeight(name custodian, int64_t weight) {
+void auditor::updateVoteWeight(name custodian, int64_t weight) {
     if (weight == 0) {
         print("\n Vote has no weight - No need to continue.");
     }
@@ -22,7 +22,7 @@ void daccustodian::updateVoteWeight(name custodian, int64_t weight) {
     });
 }
 
-void daccustodian::updateVoteWeights(const vector<name> &votes, int64_t vote_weight) {
+void auditor::updateVoteWeights(const vector<name> &votes, int64_t vote_weight) {
     for (const auto &cust : votes) {
         updateVoteWeight(cust, vote_weight);
     }
@@ -30,7 +30,7 @@ void daccustodian::updateVoteWeights(const vector<name> &votes, int64_t vote_wei
     _currentState.total_votes_on_candidates += votes.size() * vote_weight;
 }
 
-void daccustodian::modifyVoteWeights(name voter, vector<name> newVotes) {
+void auditor::modifyVoteWeights(name voter, vector<name> newVotes) {
     // This could be optimised with set diffing to avoid remove then add for unchanged votes. - later
     eosio::print("Modify vote weights: ", voter, "\n");
 

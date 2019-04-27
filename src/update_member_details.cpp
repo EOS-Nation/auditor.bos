@@ -1,5 +1,5 @@
 
-void daccustodian::updatebio(name cand, string bio) {
+void auditor::updatebio(name cand, string bio) {
 
     require_auth(cand);
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::UPDATEBIO_NOT_CURRENT_REG_CANDIDATE::Candidate is not already registered.");

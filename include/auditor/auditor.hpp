@@ -28,7 +28,7 @@ const name HIGH_PERMISSION = "high"_n;
 using namespace eosio;
 using namespace std;
 
-struct [[eosio::table("config"), eosio::contract("daccustodian")]] contr_config {
+struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     //    The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
 
@@ -94,7 +94,7 @@ struct [[eosio::table("config"), eosio::contract("daccustodian")]] contr_config 
 
 typedef singleton<"config"_n, contr_config> configscontainer;
 
-struct [[eosio::table("state"), eosio::contract("daccustodian")]] contr_state {
+struct [[eosio::table("state"), eosio::contract("auditor")]] contr_state {
     uint32_t lastperiodtime = 0;
     int64_t total_weight_of_votes = 0;
     int64_t total_votes_on_candidates = 0;
@@ -116,7 +116,7 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
     return (uint128_t{boolvalue} << 8) | longValue;
 }
 
-struct [[eosio::table("candidates"), eosio::contract("daccustodian")]] candidate {
+struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     name candidate_name;
     asset requestedpay; //unused
     asset locked_tokens;
@@ -143,7 +143,7 @@ typedef multi_index<"candidates"_n, candidate,
         indexed_by<"byreqpay"_n, const_mem_fun<candidate, uint64_t, &candidate::by_requested_pay> >
 > candidates_table;
 
-struct [[eosio::table("custodians"), eosio::contract("daccustodian")]] custodian {
+struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
     name cust_name;
     asset requestedpay; //unused
     uint64_t total_votes;
@@ -163,7 +163,7 @@ typedef multi_index<"custodians"_n, custodian,
         indexed_by<"byreqpay"_n, const_mem_fun<custodian, uint64_t, &custodian::by_requested_pay> >
 > custodians_table;
 
-struct [[eosio::table("votes"), eosio::contract("daccustodian")]] vote {
+struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
     name voter;
     name proxy;
     uint64_t weight;
@@ -180,7 +180,7 @@ typedef eosio::multi_index<"votes"_n, vote,
         indexed_by<"byproxy"_n, const_mem_fun<vote, uint64_t, &vote::by_proxy> >
 > votes_table;
 
-struct [[eosio::table("pendingpay"), eosio::contract("daccustodian")]] pay {
+struct [[eosio::table("pendingpay"), eosio::contract("auditor")]] pay {
     uint64_t key;
     name receiver;
     asset quantity;
@@ -196,7 +196,7 @@ typedef multi_index<"pendingpay"_n, pay,
         indexed_by<"byreceiver"_n, const_mem_fun<pay, uint64_t, &pay::byreceiver> >
 > pending_pay_table;
 
-struct [[eosio::table("pendingstake"), eosio::contract("daccustodian")]] tempstake {
+struct [[eosio::table("pendingstake"), eosio::contract("auditor")]] tempstake {
     name sender;
     asset quantity;
     string memo;
@@ -209,7 +209,7 @@ struct [[eosio::table("pendingstake"), eosio::contract("daccustodian")]] tempsta
 typedef multi_index<"pendingstake"_n, tempstake> pendingstake_table_t;
 
 
-class daccustodian : public contract {
+class auditor : public contract {
 
 private: // Variables used throughout the other actions.
     configscontainer config_singleton;
@@ -222,7 +222,7 @@ private: // Variables used throughout the other actions.
 
 public:
 
-    daccustodian( name s, name code, datastream<const char*> ds )
+    auditor( name s, name code, datastream<const char*> ds )
         :contract(s,code,ds),
             registered_candidates(_self, _self.value),
             votes_cast_by_members(_self, _self.value),
@@ -233,7 +233,7 @@ public:
         _currentState = contract_state.get_or_default(contr_state());
     }
 
-    ~daccustodian() {
+    ~auditor() {
         contract_state.set(_currentState, _self); // This should not run during a contract_state migration since it will prevent changing the schema with data saved between runs.
     }
 

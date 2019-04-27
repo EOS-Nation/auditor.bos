@@ -1,5 +1,5 @@
 
-void daccustodian::votecust(name voter, vector<name> newvotes) {
+void auditor::votecust(name voter, vector<name> newvotes) {
 #ifdef VOTING_DISABLED
     eosio_assert(false,"ERR::VOTECUST_VOTING_IS_DISABLED::Voting is currently disabled.");
 #endif
@@ -18,7 +18,7 @@ void daccustodian::votecust(name voter, vector<name> newvotes) {
 }
 
 
-void daccustodian::refreshvote(name voter) {
+void auditor::refreshvote(name voter) {
     if (configs().authaccount == name{0}) {
         require_auth(_self);
     } else {

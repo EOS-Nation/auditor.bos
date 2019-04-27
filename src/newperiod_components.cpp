@@ -1,5 +1,5 @@
 
-void daccustodian::distributePay() {
+void auditor::distributePay() {
     custodians_table custodians(_self, _self.value);
     auto medianAsset = configs().custpay;
 
@@ -18,14 +18,14 @@ void daccustodian::distributePay() {
 }
 
 
-void daccustodian::assertPeriodTime() {
+void auditor::assertPeriodTime() {
     uint32_t timestamp = now();
     uint32_t periodBlockCount = timestamp - _currentState.lastperiodtime;
     eosio_assert(periodBlockCount > configs().periodlength,
                  "ERR::NEWPERIOD_EARLY::New period is being called too soon. Wait until the period has completed.");
 }
 
-void daccustodian::allocateCustodians(bool early_election) {
+void auditor::allocateCustodians(bool early_election) {
 
     eosio::print("Configure custodians for the next period.");
 
@@ -79,7 +79,7 @@ void daccustodian::allocateCustodians(bool early_election) {
     }
 }
 
-void daccustodian::setCustodianAuths() {
+void auditor::setCustodianAuths() {
 
     custodians_table custodians(_self, _self.value);
 
@@ -156,7 +156,7 @@ void daccustodian::setCustodianAuths() {
             .send();
 }
 
-void daccustodian::newperiod(string message) {
+void auditor::newperiod(string message) {
 
     assertPeriodTime();
 
