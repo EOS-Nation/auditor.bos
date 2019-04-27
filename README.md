@@ -1,11 +1,11 @@
-# `daccustodian` - Custodian Elections Contract
+# `auditor.bos` - BOS Auditor Elections Contract
 
-This contract will be in charge of custodian registration and voting for candidates.  It will also contain a function which could be called periodically to update the custodian set, and allocate payments.
+This contract will be in charge of auditor registration and voting for candidates.  It will also contain a function which could be called periodically to update the auditor set, and allocate payments.
 
 When a candidate registers, they need to provide a set of configuration variables which will include things like their requested pay.  The system will select the median requested pay when choosing the actual pay.
-The median pay is to be paid to elected custodians at the end of each period. If an elected custodian resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the custodian board from the votes ranking in the candidates at that moment.
+The median pay is to be paid to elected auditors at the end of each period. If an elected auditor resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the auditor board from the votes ranking in the candidates at that moment.
 
-Eg. 12 custodians are elected and their median `requestedpay` is 100 EOSDAC If one of the custodians resigns partially through a period they will not be paid for that partial period. The median pay amount will be calculated based on the current elected custodians `requestedpay` value. If a candidate changes their requested pay it will not be included in the pay calculation until the next period if they are re-elected.
+Eg. 12 auditors are elected and their median `requestedpay` is 100 BOS If one of the auditors resigns partially through a period they will not be paid for that partial period. The median pay amount will be calculated based on the current elected auditors `requestedpay` value. If a candidate changes their requested pay it will not be included in the pay calculation until the next period if they are re-elected.
 
 ## Tables
 
@@ -19,9 +19,9 @@ Eg. 12 custodians are elected and their median `requestedpay` is 100 EOSDAC If o
 
 ### custodians
 
-- cust_name (name) - Account name of the custodian (INDEX)
-- requestedpay - The amount of pay requested by the candidate to be paid as an elected custodian for the current period.
-- total_votes - Tally of the number of votes cast to a custodian when they were elected in. This is updated as part of the `newperiod` action.
+- cust_name (name) - Account name of the auditor (INDEX)
+- requestedpay - The amount of pay requested by the candidate to be paid as an elected auditor for the current period.
+- total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newperiod` action.
 
 ### votes
 
@@ -31,7 +31,7 @@ Eg. 12 custodians are elected and their median `requestedpay` is 100 EOSDAC If o
 
 ### pendingpay
 
-- key (uint64) 				-  auto incrementing id to identify a payment due to a custodian
+- key (uint64) 				-  auto incrementing id to identify a payment due to an auditor
 - receiver (account_name) 	- The account name of the intended receiver.
 - quantity (asset)         - The amount for the payment.
 - memo (string)            - A string used in the memo to help the receiver identify it in logs.
@@ -40,24 +40,24 @@ Eg. 12 custodians are elected and their median `requestedpay` is 100 EOSDAC If o
 
 - lockupasset (asset) -  The amount of assets that are locked up by each candidate applying for election.
 - maxvotes (int default=5) - The maximum number of votes that each member can make for a candidate.
-- numelected (int) -  Number of custodians to be elected for each election count.
+- numelected (int) -  Number of auditors to be elected for each election count.
 - periodlength (uint32 =  7 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newperiod` calls.
-- authaccount ( account= "dacauthority") - account to have active auth set with all custodians on the newperiod.
-- tokenholder (account = "eosdacthedac") - The contract that holds the fund for the DAC. This is used as the source for custodian pay.
-- initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of custodians
-- vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of custodians to be set after the initial threshold has been achieved.
-- auth_threshold_high (uint8) - Number of custodians required to approve highest level actions.
-- auth_threshold_mid (uint8) - Number of custodians required to approve highest level actions.
-- auth_threshold_low (uint8) - Number of custodians required to approve highest level actions.
+- authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newperiod.
+- tokenholder ( account = "auditor.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
+- initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
+- vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
+- auth_threshold_high (uint8) - Number of auditors required to approve highest level actions.
+- auth_threshold_mid (uint8) - Number of auditors required to approve highest level actions.
+- auth_threshold_low (uint8) - Number of auditors required to approve highest level actions.
 - lockup_release_time_delay (date) - The time before locked up stake can be released back to the candidate using the unstake action
-- requested_pay_max (asset) - The max amount a custodian can requested as a candidate.
+- requested_pay_max (asset) - The max amount a auditor can requested as a candidate.
 
 ## Actions
 
 ---
 ### nominatecand
 
-This action is used to nominate a candidate for custodian elections. It must be authorised by the candidate and the candidate must be an active member of the DAC, having agreed to the latest constitution. The candidate must have transferred a number of tokens (determined by a config setting - `lockupasset`) to the contract for staking before this action is executed. This could have been from a recent transfer with the contract name in the memo or from a previous time when this account had nominated, as long as the candidate had never `unstake`d those tokens.
+This action is used to nominate a candidate for auditor elections. It must be authorised by the candidate and the candidate must be an active member of BOS, having agreed to the latest constitution. The candidate must have transferred a number of tokens (determined by a config setting - `lockupasset`) to the contract for staking before this action is executed. This could have been from a recent transfer with the contract name in the memo or from a previous time when this account had nominated, as long as the candidate had never `unstake`d those tokens.
 
 ##### Assertions:
 
@@ -72,7 +72,7 @@ This action is used to nominate a candidate for custodian elections. It must be 
 ##### Parameters:
 
     cand  			- The account id for the candidate nominating.
-    requestedpay  	- The amount of pay the candidate would like to receive if they are elected as a custodian. This amount must not exceed the maximum allowed amount of the contract config parameter (`requested_pay_max`) and the symbol must also match.
+    requestedpay  	- The amount of pay the candidate would like to receive if they are elected as a auditor. This amount must not exceed the maximum allowed amount of the contract config parameter (`requested_pay_max`) and the symbol must also match.
 
 ##### Post Condition:
 
@@ -81,7 +81,7 @@ The candidate should be present in the candidates table and be set to active. If
 ---
 ### withdrawcand
 
-This action is used to withdraw a candidate from being active for custodian elections.
+This action is used to withdraw a candidate from being active for auditor elections.
 
 #### Assertions:
 
@@ -94,17 +94,17 @@ This action is used to withdraw a candidate from being active for custodian elec
 
 ##### Post Condition:
 
-The candidate should still be present in the candidates table and be set to inactive. If the were recently an elected custodian there may be a time delay on when they can unstake their tokens from the contract. If not they will be able to unstake their tokens immediately using the unstake action.
+The candidate should still be present in the candidates table and be set to inactive. If the were recently an elected auditor there may be a time delay on when they can unstake their tokens from the contract. If not they will be able to unstake their tokens immediately using the unstake action.
 
 ---
 ### resigncust
 
-This action is used to resign as a custodian.
+This action is used to resign as a auditor.
 
 ##### Assertions:
 
 -   The `cust` account performing the action is authorised to do so.
--   The `cust` account is currently an elected custodian.
+-   The `cust` account is currently an elected auditor.
 
 ##### Parameters:
 
@@ -112,13 +112,13 @@ This action is used to resign as a custodian.
 
 ##### Post Condition:
 
-The custodian will be removed from the active custodians and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement custodian will be selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling DAC auth account will be set for the custodian board.
+The auditor will be removed from the active auditors and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement auditor will be selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling BOS auditor auth account will be set for the auditor board.
 
 ---
 
 ### updatebio
 
-Update the bio for this candidate / custodian. This will be available on the account immediately in preparation for the next election cycle.
+Update the bio for this candidate / auditor. This will be available on the account immediately in preparation for the next election cycle.
 
 ##### Assertions:
 
@@ -147,7 +147,7 @@ This action is used to update the requested pay for a candidate.
 ##### Parameters:
 
      cand          - The account id for the candidate nominating.
-     requestedpay  - A string representing the asset they would like to be paid as custodian.
+     requestedpay  - A string representing the asset they would like to be paid as auditor.
 
 ##### Post Condition:
 
@@ -157,12 +157,12 @@ The requested pay for the candidate should be updated to the new asset.
 
 ### votecust
 
-This action is to facilitate voting for candidates to become custodians of the DAC. Each member will be able to vote a configurable number of custodians set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
+This action is to facilitate voting for candidates to become auditors of BOS. Each member will be able to vote a configurable number of auditors set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
 
 ##### Assertions:
 
 -   The voter account performing the action is authorised to do so.
--   The voter account performing has agreed to the latest member terms for the DAC.
+-   The voter account performing has agreed to the latest member terms for BOS.
 -   The number of candidates in the newvotes vector is not greater than the number of allowed votes per voter as set by the contract config.
 -   Ensure there are no duplicate candidates in the voting vector.
 -   Ensure all the candidates in the vector are registered and active candidates.
@@ -180,7 +180,7 @@ An active vote record for the voter will have been created or modified to reflec
 
 ### voteproxy ( inactive development at the moment to reduce scope for the initial release)
 
-Create/update the active vote to proxy through another voter. This vote will overwrite any existing vote for either a custodian vote or proxy vote.
+Create/update the active vote to proxy through another voter. This vote will overwrite any existing vote for either a auditor vote or proxy vote.
 
 #### Message
 
@@ -217,29 +217,29 @@ The parameters are:
 
 - lockupasset(uint8_t) : defines the asset and amount required for a user to register as a candidate. This is the amount that will be locked up until the user calls `withdrawcand` in order to get the asset returned to them. If there are currently already registered candidates in the contract this cannot be changed to a different asset type because of introduced complexity of handling the staked amounts.
 - maxvotes(asset) : Defines the maximum number of candidates a user can vote for at any given time.
-- numelected(uint16_t) : The number of candidates to elect for custodians. This is used for the payment amount to custodians for median amount.
-- periodlength(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newperiod` actions at the end of processing the current one. Also is used as part of the partial payment to custodians in the case of an elected custodian resigning which would also trigger a `newperiod` action.
-- tokcontr(name) : The token contract used to manage the tokens for the DAC.
-- authaccount(name) : The managing account that controls the whole DAC.
-- tokenholder(name) : The account that controls the funds for the DAC.
-- initial_vote_quorum_percent (uint32) : The percent of voters required to activate the DAC for the first election period.
-- vote_quorum_percent (uint32) : The percent of voters required to continue the DAC for the following election periods after the first one has activated the DAC.
-- auth_threshold_high (uint8) : The number of custodians required to approve an action in the high permission category (exceptional change).
-- auth_threshold_mid (uint8) : The number of custodians required to approve an action in the mid permission category ( extraordinary change).
-- auth_threshold_low (uint8) : The number of custodians required to approve an action in the low permission category ( ordinary action such as a worker proposal).
+- numelected(uint16_t) : The number of candidates to elect for auditors. This is used for the payment amount to auditors for median amount.
+- periodlength(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newperiod` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newperiod` action.
+- tokcontr(name) : The token contract used to manage the tokens for BOS.
+- authaccount(name) : The managing account that controls the BOS auditor permission.
+- tokenholder(name) : The account that controls the funds for BOS.
+- initial_vote_quorum_percent (uint32) : The percent of voters required to activate BOS for the first election period.
+- vote_quorum_percent (uint32) : The percent of voters required to continue BOS for the following election periods after the first one has activated BOS.
+- auth_threshold_high (uint8) : The number of auditors required to approve an action in the high permission category (exceptional change).
+- auth_threshold_mid (uint8) : The number of auditors required to approve an action in the mid permission category ( extraordinary change).
+- auth_threshold_low (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).
 
 ---
 
 ### newperiod
 
-This action is to be run to end and begin each period in the DAC life cycle. It performs multiple tasks for the DAC including:
+This action is to be run to end and begin each period in BOS life cycle. It performs multiple tasks for BOS including:
 
--   Allocate custodians from the candidates tables based on those with most votes at the moment this action is run. -- This action removes and selects a full set of custodians each time it is successfully run selected from the candidates with the most votes weight. If there are not enough eligible candidates to satisfy the DAC config numbers the action adds the highest voted candidates as custodians as long their votes weight is greater than 0. At this time the held stake for the departing custodians is set to have a time delayed lockup to prevent the funds from releasing too soon after each custodian has been in office.
--   Distribute pay for the existing custodians based on the configs into the pending pay table so it can be claimed by individual candidates. -- The pay is distributed as determined by the median pay of the currently elected custodians. Therefore all elected custodians receive the same pay amount.
--   Set the DAC auths for the intended controlling accounts based on the configs thresholds with the newly elected custodians. This action asserts unless the following conditions have been met:
+-   Allocate auditors from the candidates tables based on those with most votes at the moment this action is run. -- This action removes and selects a full set of auditors each time it is successfully run selected from the candidates with the most votes weight. If there are not enough eligible candidates to satisfy BOS config numbers the action adds the highest voted candidates as auditors as long their votes weight is greater than 0. At this time the held stake for the departing auditors is set to have a time delayed lockup to prevent the funds from releasing too soon after each auditor has been in office.
+-   Distribute pay for the existing auditors based on the configs into the pending pay table so it can be claimed by individual candidates. -- The pay is distributed as determined by the median pay of the currently elected auditors. Therefore all elected auditors receive the same pay amount.
+-   Set BOS auths for the intended controlling accounts based on the configs thresholds with the newly elected auditors. This action asserts unless the following conditions have been met:
 -   The action cannot be called multiple times within the period since the last time it was previously run successfully. This minimum time between allowed calls is configured by the period length parameter in contract configs.
--   To run for the first time a minimum threshold of voter engagement must be satisfied. This is configured by the `initial_vote_quorum_percent` field in the contract config with the percentage calculated from the amount of registered votes cast by voters against the max supply of tokens for DAC's primary currency.
--   After the initial vote quorum percent has been reached subsequent calls to this action will require a minimum of `vote_quorum_percent` to vote for the votes to be considered sufficient to trigger a new period with new custodians.
+-   To run for the first time a minimum threshold of voter engagement must be satisfied. This is configured by the `initial_vote_quorum_percent` field in the contract config with the percentage calculated from the amount of registered votes cast by voters against the max supply of tokens for BOS's primary currency.
+-   After the initial vote quorum percent has been reached subsequent calls to this action will require a minimum of `vote_quorum_percent` to vote for the votes to be considered sufficient to trigger a new period with new auditors.
 
  ##### Parameters:
 
@@ -249,7 +249,7 @@ This action is to be run to end and begin each period in the DAC life cycle. It 
 
 ### claimpay
 
-This action is to claim pay as a custodian.
+This action is to claim pay as a auditor.
 
 ##### Assertions:
 
@@ -263,7 +263,7 @@ This action is to claim pay as a custodian.
 
  Post Condition:
 
-The quantity owed to the custodian as referred to by the pay record is transferred to the claimer and then the pay record is removed from the pending pay table.
+The quantity owed to the auditor as referred to by the pay record is transferred to the claimer and then the pay record is removed from the pending pay table.
 
 ---
 ### unstake
@@ -287,7 +287,7 @@ The candidate should still be present in the candidates table and should be stil
 ---
 ### firecand
 
-This action is used to remove a candidate from being a candidate for custodian elections.
+This action is used to remove a candidate from being a candidate for auditor elections.
 
 ## Assertions:
 
@@ -306,12 +306,12 @@ The candidate should still be present in the candidates table and be set to inac
 ---
 ### firecust
 
-This action is used to remove a custodian.
+This action is used to remove a auditor.
 
 ##### Assertions:
 
--   The action is authorised by the mid level of the auth account (currently elected custodian board).
--   The `cust` account is currently an elected custodian.
+-   The action is authorised by the mid level of the auth account (currently elected auditor board).
+-   The `cust` account is currently an elected auditor.
 
 ##### Parameters:
 
@@ -319,24 +319,24 @@ This action is used to remove a custodian.
 
 ##### Post Condition:
 
-The custodian will be removed from the active custodians and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement custodian will be selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling dac auth account will be set for the custodian board.
+The auditor will be removed from the active auditors and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement auditor will be selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling BOS auditor auth account will be set for the auditor board.
 
 ---
 
 # Compile
 
 
-The contract code has some compile time constants used for configuration. As a compile time constant the code has more flexibility for reuse on other DACs, and an extra layer of safety over exposing another configuration variable which could be changed after the code has been set and the ability to unit test the code without needing to modify the source just for testing.
+The contract code has some compile time constants used for configuration. As a compile time constant the code has more flexibility for reuse, and an extra layer of safety over exposing another configuration variable which could be changed after the code has been set and the ability to unit test the code without needing to modify the source just for testing.
 The available compile time flags are:
 
 - TOKENCONTRACT (default = "eosio.token") - This is to set the associated token contract to inter-operate with for tracking voting weights, registered members and staking.
-- VOTING_DISABLED (default = false) - Setting this flag will disable the ability for anyone to vote for custodians by disabling the vote action.
+- VOTING_DISABLED (default = false) - Setting this flag will disable the ability for anyone to vote for auditors by disabling the vote action.
 - TRANSFER_DELAY (default = 60 * 60) - for configuring the time delay on token transfers from the contract
 
 When put all together a compile command with all the bells and whistles might look like:
 
 ```bash
-eosio-cpp -DTOKENCONTRACT=eosio.token -DTRANSFER_DELAY=3600 -DVOTING_DISABLED -o daccustodian.wasm daccustodian.cpp
+eosio-cpp -DTOKENCONTRACT=eosio.token -DTRANSFER_DELAY=3600 -DVOTING_DISABLED -o auditor.wasm auditor.cpp
 ```
 
 > **Note:** Since there are default values for the above flags they do not all need to be included to compile successfully.
