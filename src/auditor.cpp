@@ -43,7 +43,7 @@ extern "C" { \
 EOSIO_ABI_EX(auditor,
              (updateconfig)
              (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
-             (updatebio)(stprofile)(stprofileuns)
+             (updatebio)
              (votecust)(refreshvote)
              (newperiod)
              (claimpay)

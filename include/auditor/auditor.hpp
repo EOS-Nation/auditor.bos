@@ -163,6 +163,17 @@ typedef multi_index<"custodians"_n, custodian,
         indexed_by<"byreqpay"_n, const_mem_fun<custodian, uint64_t, &custodian::by_requested_pay> >
 > custodians_table;
 
+
+struct [[eosio::table("bios"), eosio::contract("auditor")]] bios {
+    name candidate_name;
+    string bio;
+
+    uint64_t primary_key() const { return candidate_name.value; }
+    EOSLIB_SERIALIZE(bios, (candidate_name)(bio))
+};
+
+typedef multi_index<"bios"_n, bios > bios_table;
+
 struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
     name voter;
     name proxy;
@@ -217,6 +228,7 @@ private: // Variables used throughout the other actions.
     candidates_table registered_candidates;
     votes_table votes_cast_by_members;
     pending_pay_table pending_pay;
+    bios_table candidate_bios;
 
     contr_state _currentState;
 
@@ -227,6 +239,7 @@ public:
             registered_candidates(_self, _self.value),
             votes_cast_by_members(_self, _self.value),
             pending_pay(_self, _self.value),
+            candidate_bios(_self, _self.value),
             config_singleton(_self, _self.value),
             contract_state(_self, _self.value) {
 
@@ -345,11 +358,6 @@ public:
      * Nothing from this action is stored on the blockchain. It is only intended to ensure authentication of changing the bio which will be stored off chain.
      */
     ACTION updatebio(name cand, std::string bio);
-    [[eosio::action]]
-    inline void stprofile(name cand, std::string profile) { require_auth(cand); };
-
-    [[eosio::action]]
-    inline void stprofileuns(name cand, std::string profile) { require_auth(cand); };
 
     /**
      * This action is used to update the requested pay for a candidate.

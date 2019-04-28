@@ -158,13 +158,22 @@ void auditor::setCustodianAuths() {
 
 void auditor::newperiod(string message) {
 
+    print("Start");
+
     assertPeriodTime();
+
+    print("\nPeriodTime");
 
     contr_config config = configs();
 
+    print("\nConfigs");
+
     // Get the max supply of the lockup asset token (eg. BOS)
     auto tokenStats = stats(name(TOKEN_CONTRACT), config.lockupasset.symbol.code().raw()).begin();
+    
     uint64_t max_supply = tokenStats->supply.amount;
+
+    print("\nRead stats");
 
     double percent_of_current_voter_engagement =
             double(_currentState.total_weight_of_votes) / double(max_supply) * 100.0;

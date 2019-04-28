@@ -16,7 +16,6 @@ struct currency_stats {
     eosio::asset supply;
     eosio::asset max_supply;
     name issuer;
-    bool transfer_locked = false;
 
     uint64_t primary_key() const { return supply.symbol.code().raw(); }
 };
