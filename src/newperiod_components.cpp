@@ -160,6 +160,8 @@ void auditor::newperiod(string message) {
 
     print("Start");
 
+    print("Start");
+
     assertPeriodTime();
 
     print("\nPeriodTime");

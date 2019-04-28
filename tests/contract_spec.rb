@@ -102,11 +102,15 @@ def seed_system_contracts
   cleos create account eosio eosio.saving #{EOSIO_PUB}
   cleos create account eosio eosio.bpay #{EOSIO_PUB}
   cleos create account eosio eosio.vpay #{EOSIO_PUB}
+  cleos create account eosio #{ACCOUNT_NAME} #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
+   cleos create account eosio dacauthority #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
+   cleos create account eosio bosauditfund #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
+   cleos create account eosio dacocoiogmbh #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
   cleos push action eosio setpriv  '["eosio.msig",1]' -p eosio
   cleos set contract eosio.msig #{CONTRACTS_DIR}/eosio.msig -p eosio.msig
   cleos set contract eosio.token #{CONTRACTS_DIR}/eosio.token -p eosio.token
   cleos push action eosio.token create '["eosio","10000000000.0000 EOS"]' -p eosio.token
-  cleos push action eosio.token issue '["eosio", "1000000000.0000 EOS", "Initial EOS amount."]' -p eosio
+  cleos push action eosio.token issue '["eosio", "100000.0000 EOS", "Initial EOS amount."]' -p eosio
   cleos set contract eosio #{CONTRACTS_DIR}/eosio.system -p eosio
   SHELL
 
@@ -119,17 +123,12 @@ def install_contracts
   beforescript = <<~SHELL
    # set -x
 
-   cleos system newaccount --stake-cpu \"10.0000 EOS\" --stake-net \"10.0000 EOS\" --transfer --buy-ram-kbytes 1024 eosio #{ACCOUNT_NAME} #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
-   cleos system newaccount --stake-cpu \"10.0000 EOS\" --stake-net \"10.0000 EOS\" --transfer --buy-ram-kbytes 1024 eosio dacauthority #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
-   cleos system newaccount --stake-cpu \"10.0000 EOS\" --stake-net \"10.0000 EOS\" --transfer --buy-ram-kbytes 1024 eosio bosauditfund #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
-   cleos system newaccount --stake-cpu \"10.0000 EOS\" --stake-net \"10.0000 EOS\" --transfer --buy-ram-kbytes 1024 eosio dacocoiogmbh #{CONTRACT_OWNER_PUBLIC_KEY} #{CONTRACT_ACTIVE_PUBLIC_KEY}
-
    # Setup the inital permissions.
    cleos set account permission dacauthority owner '{"threshold": 1,"keys": [{"key": "#{CONTRACT_ACTIVE_PUBLIC_KEY}","weight": 1}],"accounts": [{"permission":{"actor":"daccustodian","permission":"eosio.code"},"weight":1}]}' '' -p dacauthority@owner
    # cleos set account permission bosauditfund active '{"threshold": 1,"keys": [{"key": "#{CONTRACT_ACTIVE_PUBLIC_KEY}","weight": 1}],"accounts": [{"permission":{"actor":"daccustodian","permission":"eosio.code"},"weight":1}]}' owner -p bosauditfund@owner
    cleos set account permission bosauditfund xfer '{"threshold": 1,"keys": [{"key": "#{CONTRACT_ACTIVE_PUBLIC_KEY}","weight": 1}],"accounts": [{"permission":{"actor":"daccustodian","permission":"eosio.code"},"weight":1}]}' active -p bosauditfund@active
    cleos set account permission daccustodian xfer '{"threshold": 1,"keys": [{"key": "#{CONTRACT_ACTIVE_PUBLIC_KEY}","weight": 1}],"accounts": [{"permission":{"actor":"daccustodian","permission":"eosio.code"},"weight":1}]}' active -p daccustodian@active
-   cleos push action eosio.token issue '["bosauditfund", "100000.0000 EOS", "Initial EOS amount."]' -p eosio
+   cleos push action eosio.token issue '["bosauditfund", "1000.0000 EOS", "Initial EOS amount."]' -p eosio
 
    cleos set action permission bosauditfund eosio.token transfer xfer
    cleos set action permission daccustodian eosio.token transfer xfer  
@@ -161,7 +160,7 @@ end
 # Configure the initial state for the contracts for elements that are assumed to work from other contracts already.
 def configure_contracts
   # configure accounts for eosio.token
- `cleos push action eosio.token issue '{ "to": "bosauditfund", "quantity": "100000.0000 EOS", "memo": "Initial EOS amount."}' -p eosio`
+#  `cleos push action eosio.token issue '{ "to": "bosauditfund", "quantity": "100000.0000 EOS", "memo": "Initial EOS amount."}' -p eosio`
 
   #create users
   # Ensure terms are registered in the token contract
@@ -601,7 +600,7 @@ describe "eosdacelect" do
       end
     end
 
-    ###TODO: Transfers dont update values. Need to use
+    ###TODO: Transfers dont update values. Need to test refresh vote command.
 
     # context "After token transfer vote weight should move to different candidates" do
     #   before(:all) do
@@ -668,7 +667,7 @@ describe "eosdacelect" do
   describe "newperiod" do
     before(:all) do
       seed_account("voter3", issue: "110.0000 EOS", memberreg: "New Latest terms")
-      seed_account("whale1", issue: "15000.0000 EOS", memberreg: "New Latest terms")
+      seed_account("whale1", issue: "1500000.0000 EOS", memberreg: "New Latest terms")
     end
 
     describe "with insufficient votes to trigger the dac should fail" do
@@ -676,7 +675,7 @@ describe "eosdacelect" do
         `cleos push action daccustodian updateconfig '{"newconfig": { "custpay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "periodlength": 5, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "serviceprovider": "dacocoiogmbh", "should_pay_via_service_provider": 1, "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10, "requested_pay_max": "450.0000 EOS"}}' -p dacauthority`
       end
       command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
-      its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the DAC.')}
+      its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
     end
 
     describe "allocateCust" do
@@ -687,7 +686,7 @@ describe "eosdacelect" do
 
       context "given there are not enough candidates to fill the custodians" do
         command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
-        its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the DAC.')}
+        its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
       end
 
       context "given there are enough candidates to fill the custodians but not enough have votes greater than 0" do
@@ -710,7 +709,7 @@ describe "eosdacelect" do
         end
 
         command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
-        its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the DAC.')}
+        its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
       end
 
       context "given there are enough votes with total_votes over 0" do
@@ -721,7 +720,7 @@ describe "eosdacelect" do
         end
         context "But not enough engagement to active the DAC" do
           command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
-          its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the DAC.')}
+          its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
         end
 
         context "And enough voter weight to activate the DAC" do
