@@ -55,6 +55,7 @@ def seed_account(name, issue: nil, memberreg: nil, stake: nil, requestedpay: nil
 
   unless issue.nil?
     `cleos push action eosio.token issue '{ "to": "#{name}", "quantity": "#{issue}", "memo": "Initial amount."}' -p eosio`
+    `cleos system delegatebw #{name} #{name} "0.0000 EOS" "#{issue}" -p #{name}`
   end
 
   # unless memberreg.nil?
@@ -62,11 +63,12 @@ def seed_account(name, issue: nil, memberreg: nil, stake: nil, requestedpay: nil
   # end
 
   unless stake.nil?
+    `cleos push action eosio.token issue '{ "to": "#{name}", "quantity": "#{stake}", "memo": "Initial amount."}' -p eosio`
     `cleos push action eosio.token transfer '{ "from": "#{name}", "to": "daccustodian", "quantity": "#{stake}","memo":"daccustodian"}' -p #{name}`
   end
 
   unless requestedpay.nil?
-    `cleos push action daccustodian nominatecand '{ "cand": "#{name}", "bio": "any bio"}' -p #{name}`
+    `cleos push action daccustodian nominatecand '{ "cand": "#{name}" }' -p #{name}`
   end
 end
 
@@ -206,6 +208,7 @@ describe "eosdacelect" do
 
     context "with valid and registered member after transferring insufficient staked tokens" do
       before(:all) do
+        `cleos push action eosio.token issue '{ "to": "testreguser1", "quantity": "10.0000 EOS", "memo": "Initial amount."}' -p eosio`
         `cleos push action eosio.token transfer '{ "from": "testreguser1", "to": "daccustodian", "quantity": "5.0000 EOS","memo":"daccustodian"}' -p testreguser1 -f`
         # TODO: Removed memo requirement... do we want it back?
         # Verify that a transaction with an invalid account memo still is insufficient funds.
