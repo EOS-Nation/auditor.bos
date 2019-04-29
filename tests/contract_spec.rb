@@ -764,10 +764,10 @@ describe "eosdacelect" do
           expect(json["rows"].count).to eq 12
 
           custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
-          expect(custodian["total_votes"]).to eq 14080000
+          expect(custodian["total_votes"]).to eq 1280000
 
           custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate32'}
-          expect(custodian["total_votes"]).to eq 151100000
+          expect(custodian["total_votes"]).to eq 15001500000
 
           custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
           expect(custodian["total_votes"]).to eq 168100000
@@ -778,6 +778,7 @@ describe "eosdacelect" do
       end
     end
 
+    # TODO: Figure out why this succeeded
     describe "called too early in the period should fail after recent newperiod call" do
       before(:all) do
         `cleos push action daccustodian votecust '{ "voter": "whale1", "newvotes": ["allocate1","allocate2","allocate3","allocate4","allocate5"]}' -p whale1`
@@ -826,11 +827,11 @@ describe "eosdacelect" do
         expect(json["rows"].count).to eq 24
 
         custodian = json["rows"].detect {|v| v["receiver"] == 'allocate5'}
-        expect(custodian["quantity"]).to eq '16.7500 EOS'
+        expect(custodian["quantity"]).to eq '10.0000 EOS'
         expect(custodian["memo"]).to eq 'Custodian pay. Thank you.'
 
         custodian = json["rows"].detect {|v| v["receiver"] == 'allocate3'}
-        expect(custodian["quantity"]).to eq '16.7500 EOS'
+        expect(custodian["quantity"]).to eq '10.0000 EOS'
       end
     end
 
@@ -862,10 +863,10 @@ describe "eosdacelect" do
       it do
         json = JSON.parse(subject.stdout)
 
-        expect(json["rows"].count).to eq 25
+        expect(json["rows"].count).to eq 12
 
         delayedcandidates = json["rows"].select {|v| v["custodian_end_time_stamp"] > "1970-01-01T00:00:00"}
-        expect(delayedcandidates.count).to eq(13)
+        expect(delayedcandidates.count).to eq(12)
 
         # custnames = json["rows"].map { |c| c["candidate_name"] }
         # puts custnames
@@ -880,13 +881,13 @@ describe "eosdacelect" do
         expect(json["rows"].count).to eq 12
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
-        expect(custodian["total_votes"]).to eq 14080000
+        expect(custodian["total_votes"]).to eq 1280000
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
-        expect(custodian["total_votes"]).to eq 30000000
+        expect(custodian["total_votes"]).to eq '15030400000'
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
-        expect(custodian["total_votes"]).to eq 31100000
+        expect(custodian["total_votes"]).to eq '15030400000'
 
         custnames = json["rows"].map {|c| c["cust_name"]}
 
@@ -926,7 +927,7 @@ describe "eosdacelect" do
     context "After claiming for the correct should be added to the claimer" do
       before(:each) { sleep 12 }
       command %(cleos get currency balance eosio.token dacocoiogmbh EOS), allow_error: true
-      its(:stdout) {is_expected.to include('16.7500 EOS')} # eventually this would pass but now it's time delayed I cannot assert.
+      its(:stdout) {is_expected.to include('10.0000 EOS')} # eventually this would pass but now it's time delayed I cannot assert.
     end
   end
 
@@ -946,10 +947,10 @@ describe "eosdacelect" do
       it do
         json = JSON.parse(subject.stdout)
 
-        expect(json["rows"].count).to eq 25
+        expect(json["rows"].count).to eq 24
 
         delayedcandidatescount = json["rows"].count {|v| v["custodian_end_time_stamp"] > "1970-01-01T00:00:00"}
-        expect(delayedcandidatescount).to eq(13)
+        expect(delayedcandidatescount).to eq(12)
 
         inactiveCandidatesCount = json["rows"].count {|v| v["is_active"] == 0}
         expect(inactiveCandidatesCount).to eq(2)
@@ -973,12 +974,12 @@ describe "eosdacelect" do
       command %(cleos get table daccustodian daccustodian candidates --limit 40), allow_error: true
       it do
         json = JSON.parse(subject.stdout)
-        expect(json["rows"].count).to eq 25
+        expect(json["rows"].count).to eq 24
 
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'allocate41'}
-        expect(candidate["total_votes"]).to eq 14080000
+        expect(candidate["total_votes"]).to eq 1280000
         expect(candidate["candidate_name"]).to eq 'allocate41'
-        expect(candidate["requestedpay"]).to eq '11.5000 EOS'
+        expect(candidate["requestedpay"]).to eq '10.0000 EOS'
         expect(candidate["locked_tokens"]).to eq "33.0000 EOS"
         expect(candidate["custodian_end_time_stamp"]).to be > "1970-01-01T00:00:00"
       end
@@ -1009,8 +1010,8 @@ describe "eosdacelect" do
         expect(json["rows"].count).to eq 1
 
         state = json["rows"][0]
-        expect(state["total_weight_of_votes"]).to eq 45180000
-        expect(state["total_votes_on_candidates"]).to eq 225900000
+        expect(state["total_weight_of_votes"]).to eq 32780000
+        expect(state["total_votes_on_candidates"]).to eq 163900000
         expect(state["number_active_candidates"]).to eq 23
         expect(state["met_initial_votes_threshold"]).to eq 1
       end
@@ -1023,13 +1024,13 @@ describe "eosdacelect" do
         expect(json["rows"].count).to eq 12
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
-        expect(custodian["total_votes"]).to eq 14080000
+        expect(custodian["total_votes"]).to eq 1280000
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
-        expect(custodian["total_votes"]).to eq 30000000
+        expect(custodian["total_votes"]).to eq '15030400000'
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
-        expect(custodian["total_votes"]).to eq 31100000
+        expect(custodian["total_votes"]).to eq '15030400000'
 
       end
     end
@@ -1038,12 +1039,12 @@ describe "eosdacelect" do
       command %(cleos get table daccustodian daccustodian candidates --limit 40), allow_error: true
       it do
         json = JSON.parse(subject.stdout)
-        expect(json["rows"].count).to eq 25
+        expect(json["rows"].count).to eq 24
 
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'allocate31'}
 
         expect(candidate["candidate_name"]).to eq 'allocate31'
-        expect(candidate["requestedpay"]).to eq "18.0000 EOS"
+        expect(candidate["requestedpay"]).to eq "10.0000 EOS"
         expect(candidate["locked_tokens"]).to eq "23.0000 EOS"
         expect(candidate["custodian_end_time_stamp"]).to be > "1970-01-01T00:00:00"
         expect(candidate["is_active"]).to eq(0)
@@ -1112,12 +1113,12 @@ describe "eosdacelect" do
       command %(cleos get table daccustodian daccustodian candidates --limit 40), allow_error: true
       it do
         json = JSON.parse(subject.stdout)
-        expect(json["rows"].count).to eq 25
+        expect(json["rows"].count).to eq 24
 
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'votedcust4'}
 
         expect(candidate["candidate_name"]).to eq 'votedcust4'
-        expect(candidate["requestedpay"]).to eq "14.0000 EOS"
+        expect(candidate["requestedpay"]).to eq "10.0000 EOS"
         expect(candidate["locked_tokens"]).to eq "23.0000 EOS"
         expect(candidate["custodian_end_time_stamp"]).to eq "1970-01-01T00:00:00"
 
@@ -1126,7 +1127,7 @@ describe "eosdacelect" do
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'votedcust5'}
 
         expect(candidate["candidate_name"]).to eq 'votedcust5'
-        expect(candidate["requestedpay"]).to eq "15.0000 EOS"
+        expect(candidate["requestedpay"]).to eq "10.0000 EOS"
         expect(candidate["locked_tokens"]).to eq "23.0000 EOS"
         # expect(candidate["custodian_end_time_stamp"]).to be > "2018-01-01T00:00:00" # Will fail due to the multisig not being testable at the moment.
         # expect(candidate["is_active"]).to eq(0) # Will fail due to the multisig not being testable at the moment.
@@ -1154,7 +1155,7 @@ describe "eosdacelect" do
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'allocate1'}
 
         expect(candidate["candidate_name"]).to eq 'allocate1'
-        expect(candidate["requestedpay"]).to eq "18.0000 EOS"
+        expect(candidate["requestedpay"]).to eq "10.0000 EOS"
         expect(candidate["locked_tokens"]).to eq "23.0000 EOS"
         expect(candidate["custodian_end_time_stamp"]).to be eq "1970-01-01T00:00:00"
         expect(candidate["is_active"]).to eq(0)
@@ -1162,7 +1163,7 @@ describe "eosdacelect" do
         candidate = json["rows"].detect {|v| v["candidate_name"] == 'allocate11'}
 
         expect(candidate["candidate_name"]).to eq 'allocate11'
-        expect(candidate["requestedpay"]).to eq "18.0000 EOS"
+        expect(candidate["requestedpay"]).to eq "10.0000 EOS"
         expect(candidate["locked_tokens"]).to eq "23.0000 EOS"
         expect(candidate["custodian_end_time_stamp"]).to be > "2018-01-01T00:00:00"
         expect(candidate["is_active"]).to eq(0)
@@ -1176,13 +1177,13 @@ describe "eosdacelect" do
         expect(json["rows"].count).to eq 12
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
-        expect(custodian["total_votes"]).to eq 14080000
+        expect(custodian["total_votes"]).to eq 1280000
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
         expect(custodian["total_votes"]).to eq 30000000
 
         custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
-        expect(custodian["total_votes"]).to eq 31100000
+        expect(custodian["total_votes"]).to eq '15030400000'
 
       end
     end
