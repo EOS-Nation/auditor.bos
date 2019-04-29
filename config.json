@@ -1,0 +1,17 @@
+{
+    "auth_threshold_high": 4,
+    "auth_threshold_mid": 4,
+    "auth_threshold_low": 3,
+    "authaccount": "auditor.bos",
+    "initial_vote_quorum_percent": 15,
+    "lockup_release_time_delay": 3600,
+    "lockupasset": "100000.0000 BOS",
+    "maxvotes": 3,
+    "numelected": 5,
+    "periodlength": 604800,
+    "requested_pay_max": "100.0000 BOS",
+    "tokenholder": "auditpay.bos",
+    "vote_quorum_percent": 3,
+    "serviceprovider": "refwps.bos",
+    "should_pay_via_service_provider": 1
+}
