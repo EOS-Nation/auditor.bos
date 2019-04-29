@@ -43,7 +43,7 @@ Eg. 12 auditors are elected and their median `requestedpay` is 100 BOS If one of
 - numelected (int) -  Number of auditors to be elected for each election count.
 - periodlength (uint32 =  7 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newperiod` calls.
 - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newperiod.
-- tokenholder ( account = "auditor.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
+- tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
 - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
 - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
 - auth_threshold_high (uint8) - Number of auditors required to approve highest level actions.

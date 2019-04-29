@@ -12,8 +12,8 @@ RSpec.configure do |config|
   config.include RSpecCommand
 end
 
-EOSIO_PUB = 'EOS8kkhi1qYPWJMpDJXabv4YnqjuzisA5ZdRpGG8vhSGmRDqi6CUn'
-EOSIO_PVT = '5KDFWhsMK3fuze6yXgFRmVDEEE5kbQJrJYCBhGKV2KWHCbjsYYy'
+EOSIO_PUB = 'EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV'
+EOSIO_PVT = '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'
 
 CONTRACT_OWNER_PRIVATE_KEY = '5K86iZz9h8jwgGDttMPcHqFHHru5ueqnfDs5fVSHfm8bJt8PjK6'
 CONTRACT_OWNER_PUBLIC_KEY = 'EOS6Y1fKGLVr2zEFKKfAmRUoH1LzM7crJEBi4dL5ikYeGYqiJr6SS'
@@ -29,6 +29,10 @@ TEST_ACTIVE_PUBLIC_KEY = 'EOS7rjn3r52PYd2ppkVEKYvy6oRDP9MZsJUPB2MStrak8LS36pnTZ'
 
 CONTRACT_NAME = 'daccustodian'
 ACCOUNT_NAME = 'daccustodian'
+
+TOKENCONTRACT = 'eosio.token'
+AUTHACCOUNT = 'auditor.bos'
+TOKENHOLDER = 'auditpay.bos'
 
 CONTRACTS_DIR = 'dependencies'
 
