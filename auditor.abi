@@ -26,7 +26,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "requestedpay",
+                    "name": "auditor_pay",
                     "type": "asset"
                 },
                 {
@@ -66,7 +66,7 @@
                     "type": "asset"
                 },
                 {
-                    "name": "custpay",
+                    "name": "auditor_pay",
                     "type": "asset"
                 },
                 {
@@ -112,10 +112,6 @@
                 {
                     "name": "lockup_release_time_delay",
                     "type": "uint32"
-                },
-                {
-                    "name": "requested_pay_max",
-                    "type": "asset"
                 }
             ]
         },
@@ -154,7 +150,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "requestedpay",
+                    "name": "auditor_pay",
                     "type": "asset"
                 },
                 {
@@ -367,12 +363,12 @@
         {
             "name": "newperiod",
             "type": "newperiod",
-            "ricardian_contract": "## ACTION: newperiod\n**PARAMETERS:**\n* __message__ is string used only for logging in the blockchain history and serves no purpose in the action contract logic.\n\n**INTENT:** The intent of {{ newperiod }} is to signal the end of one election period and commence the next. It performs several actions after the following conditions are met:\n * The action is not called before the period should have ended\n * Enough voter value has participated to trigger the initial running of the BOS\n * After BOS auditors has started enough voter value has continued engagement with the BOS auditor voting process.\n1. Calculate the mean `requestedpay` of all the currently elected auditors.\n2. Distribute the median pay amount to all the currently elected auditors. This is achieved by adding a record to the `pendingpay` table with the auditor and the amount payable in preparation for an authorised action to `claimpay`.\n3. Captures the highest voted candidates to set them as the auditors for the next period based on the accumulated vote weight.\n4. Set the permissions for the elected auditors so they have sufficient permission to run the BOS auditor permission according to the constitution and technical permissions design.\n5. Set the time for the beginning of the next period to mark the reset anniversary for the BOS auditor elections.\n\n**TERM:** The action changes the relevant contract data until a subsequent newperiod is called."
+            "ricardian_contract": "## ACTION: newperiod\n**PARAMETERS:**\n* __message__ is string used only for logging in the blockchain history and serves no purpose in the action contract logic.\n\n**INTENT:** The intent of {{ newperiod }} is to signal the end of one election period and commence the next. It performs several actions after the following conditions are met:\n * The action is not called before the period should have ended\n * Enough voter value has participated to trigger the initial running of the BOS\n * After BOS auditors has started enough voter value has continued engagement with the BOS auditor voting process.\n1. Distribute the median pay amount to all the currently elected auditors. This is achieved by adding a record to the `pendingpay` table with the auditor and the amount payable in preparation for an authorised action to `claimpay`.\n2. Captures the highest voted candidates to set them as the auditors for the next period based on the accumulated vote weight.\n3. Set the permissions for the elected auditors so they have sufficient permission to run the BOS auditor permission according to the constitution and technical permissions design.\n4. Set the time for the beginning of the next period to mark the reset anniversary for the BOS auditor elections.\n\n**TERM:** The action changes the relevant contract data until a subsequent newperiod is called."
         },
         {
             "name": "nominatecand",
             "type": "nominatecand",
-            "ricardian_contract": "## ACTION: nominatecand\n**PARAMETERS:**\n* __cand__ is an account_name parameter for the nominating candidate.\n* __requestedpay__ is an asset requested by the candidate as pay for being an elected auditor. It should be passed to the action in the format: \\\"10.0000 BOS\\\".\n\n**INTENT:** The intent of {{ nominatecand }} is to nominates a candidate to auditor election, Accounts must nominate as a candidate before they can be voted for. The candidate must lock a configurable number of tokens before trying to nominate (configurable via {{ updateconfig }} in the parameter lockupasset which will be sent from the token contract as defined and set in the code of the contract. If a user previously been a candidate they may have enough staked tokens to not require further staking but will otherwise need to transfer the difference to meet the required stake.\n\n**TERM:** A candidate remains a candidate until they are removed from candidate status by a subsequent transaction."
+            "ricardian_contract": "## ACTION: nominatecand\n**PARAMETERS:**\n* __cand__ is an account_name parameter for the nominating candidate.\n\n**INTENT:** The intent of {{ nominatecand }} is to nominates a candidate to auditor election, Accounts must nominate as a candidate before they can be voted for. The candidate must lock a configurable number of tokens before trying to nominate (configurable via {{ updateconfig }} in the parameter lockupasset which will be sent from the token contract as defined and set in the code of the contract. If a user previously been a candidate they may have enough staked tokens to not require further staking but will otherwise need to transfer the difference to meet the required stake.\n\n**TERM:** A candidate remains a candidate until they are removed from candidate status by a subsequent transaction."
         },
         {
             "name": "refreshvote",
@@ -397,7 +393,7 @@
         {
             "name": "updateconfig",
             "type": "updateconfig",
-            "ricardian_contract": "## ACTION: updateconfig\n**PARAMETERS:**\n* __lockupasset__ is an asset to be locked up as part of the nominating process for a auditor passed to the action in the format: \\\"10.0000 BOS\\\". default value: \\\"10.0000 BOS\\\"\n* __maxvotes__ is a integer to configure the maximum number of allowed votes for a nominated member in any single voting action. The default value is 5.\n* __numelected__ is a integer to configure the number of candidates that will be elected as auditors of the DAC. default value is 12.\n* __periodlength__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.\n* __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,\n* __tokenholder__ The account that controls the funds for the DAC.\n* __initial_vote_quorum_percent__ The percent of voters required to activate the DAC for the first election period.\n* __auth_threshold_high__ percentage of votes of auditors required to approve highest level actions.\n* __auth_threshold_mid__ percentage of votes of auditors required to approve medium level actions.\n* __auth_threshold_low__ percentage of votes of auditors required to approve lowest level actions.\n* __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.\n* __asset requested_pay_max__\n\n**INTENT:** The intent of {{ updateconfig }} is update the configuration for the running contract of selected parameters without needing change the source code. This requires a privileged account.\n**TERM:** The action sets the configuration until it is set by a subsequent updateconfig action."
+            "ricardian_contract": "## ACTION: updateconfig\n**PARAMETERS:**\n* __lockupasset__ is an asset to be locked up as part of the nominating process for a auditor passed to the action in the format: \\\"10.0000 BOS\\\". default value: \\\"10.0000 BOS\\\"\n* __maxvotes__ is a integer to configure the maximum number of allowed votes for a nominated member in any single voting action. The default value is 5.\n* __numelected__ is a integer to configure the number of candidates that will be elected as auditors of the DAC. default value is 12.\n* __periodlength__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.\n* __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,\n* __tokenholder__ The account that controls the funds for the DAC.\n* __initial_vote_quorum_percent__ The percent of voters required to activate the DAC for the first election period.\n* __auth_threshold_high__ percentage of votes of auditors required to approve highest level actions.\n* __auth_threshold_mid__ percentage of votes of auditors required to approve medium level actions.\n* __auth_threshold_low__ percentage of votes of auditors required to approve lowest level actions.\n* __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.\n\n**INTENT:** The intent of {{ updateconfig }} is update the configuration for the running contract of selected parameters without needing change the source code. This requires a privileged account.\n**TERM:** The action sets the configuration until it is set by a subsequent updateconfig action."
         },
         {
             "name": "votecust",

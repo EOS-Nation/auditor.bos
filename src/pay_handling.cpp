@@ -4,7 +4,9 @@ void auditor::claimpay(uint64_t payid) {
 
     const pay &payClaim = pending_pay.get(payid, "ERR::CLAIMPAY_INVALID_CLAIM_ID::Invalid pay claim id.");
 
-    require_auth(payClaim.receiver);
+    name receiver = payClaim.receiver;
+
+    require_auth(receiver);
 
     transaction deferredTrans{};
 
@@ -12,22 +14,11 @@ void auditor::claimpay(uint64_t payid) {
 
     print("constructed memo for the service contract: " + memo);
 
-    name receiver = payClaim.receiver;
-
-    if (payClaim.quantity.symbol == configs().requested_pay_max.symbol) {
-
-        deferredTrans.actions.emplace_back(
-            action(permission_level{configs().tokenholder, "xfer"_n},
-                "eosio.token"_n, "transfer"_n,
-                std::make_tuple(configs().tokenholder, receiver, payClaim.quantity, memo)
-            ));
-    } else {
-        deferredTrans.actions.emplace_back(
-            action(permission_level{configs().tokenholder, "xfer"_n},
-                name(TOKEN_CONTRACT), "transfer"_n,
-                std::make_tuple(configs().tokenholder, receiver, payClaim.quantity, memo)
-            ));
-    }
+    deferredTrans.actions.emplace_back(
+        action(permission_level{configs().tokenholder, "xfer"_n},
+            name(TOKEN_CONTRACT), "transfer"_n,
+            std::make_tuple(configs().tokenholder, receiver, payClaim.quantity, memo)
+        ));
 
     deferredTrans.delay_sec = TRANSFER_DELAY;
     deferredTrans.send(uint128_t(payid) << 64 | now(), _self);

@@ -1,14 +1,14 @@
 
 void auditor::distributePay() {
     custodians_table custodians(_self, _self.value);
-    auto medianAsset = configs().custpay;
+    auto auditor_pay = configs().auditor_pay;
 
-    if (medianAsset.amount > 0) {
+    if (auditor_pay.amount > 0) {
         for (auto cust: custodians) {
             pending_pay.emplace(_self, [&](pay &p) {
                 p.key = pending_pay.available_primary_key();
                 p.receiver = cust.cust_name;
-                p.quantity = medianAsset;
+                p.quantity = auditor_pay;
                 p.memo = "Auditor pay. Thank you.";
             });
         }
@@ -63,7 +63,7 @@ void auditor::allocateCustodians(bool early_election) {
         } else {
             custodians.emplace(_self, [&](custodian &c) {
                 c.cust_name = cand_itr->candidate_name;
-                c.requestedpay = cand_itr->requestedpay;
+                c.auditor_pay = cand_itr->auditor_pay;
                 c.total_votes = cand_itr->total_votes;
             });
 

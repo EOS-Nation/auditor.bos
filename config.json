@@ -9,7 +9,7 @@
     "maxvotes": 3,
     "numelected": 5,
     "periodlength": 604800,
-    "requested_pay_max": "100.0000 BOS",
+    "auditor_pay": "100.0000 BOS",
     "tokenholder": "auditpay.bos",
     "vote_quorum_percent": 3
 }

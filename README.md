@@ -5,8 +5,6 @@ This contract will be in charge of auditor registration and voting for candidate
 When a candidate registers, they need to provide a set of configuration variables which will include things like their requested pay.  The system will select the median requested pay when choosing the actual pay.
 The median pay is to be paid to elected auditors at the end of each period. If an elected auditor resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the auditor board from the votes ranking in the candidates at that moment.
 
-Eg. 12 auditors are elected and their median `requestedpay` is 100 BOS If one of the auditors resigns partially through a period they will not be paid for that partial period. The median pay amount will be calculated based on the current elected auditors `requestedpay` value. If a candidate changes their requested pay it will not be included in the pay calculation until the next period if they are re-elected.
-
 ## Tables
 
 ### candidates
@@ -14,13 +12,11 @@ Eg. 12 auditors are elected and their median `requestedpay` is 100 BOS If one of
 - candidate_name (name)   - Account name of the candidate (INDEX)
 - isactive (int8) 			- Boolean indicating if the candidate is currently available for election. (INDEX)
 - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
-- requestedpay (asset) - The amount of pay requested by the candidate to be paid if they were elected for the following period.
 - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newperiod` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
 
 ### custodians
 
 - cust_name (name) - Account name of the auditor (INDEX)
-- requestedpay - The amount of pay requested by the candidate to be paid as an elected auditor for the current period.
 - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newperiod` action.
 
 ### votes
@@ -50,7 +46,6 @@ Eg. 12 auditors are elected and their median `requestedpay` is 100 BOS If one of
 - auth_threshold_mid (uint8) - Number of auditors required to approve highest level actions.
 - auth_threshold_low (uint8) - Number of auditors required to approve highest level actions.
 - lockup_release_time_delay (date) - The time before locked up stake can be released back to the candidate using the unstake action
-- requested_pay_max (asset) - The max amount a auditor can requested as a candidate.
 
 ## Actions
 
@@ -72,7 +67,6 @@ This action is used to nominate a candidate for auditor elections. It must be au
 ##### Parameters:
 
     cand  			- The account id for the candidate nominating.
-    requestedpay  	- The amount of pay the candidate would like to receive if they are elected as a auditor. This amount must not exceed the maximum allowed amount of the contract config parameter (`requested_pay_max`) and the symbol must also match.
 
 ##### Post Condition:
 
@@ -142,12 +136,10 @@ This action is used to update the requested pay for a candidate.
 
 -   The `cand` account performing the action is authorised to do so.
 -   The candidate is currently registered as a candidate.
--   The requestedpay is not more than the requested pay amount.
 
 ##### Parameters:
 
      cand          - The account id for the candidate nominating.
-     requestedpay  - A string representing the asset they would like to be paid as auditor.
 
 ##### Post Condition:
 

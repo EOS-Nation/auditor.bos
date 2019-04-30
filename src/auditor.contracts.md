@@ -98,7 +98,6 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 * __auth_threshold_mid__ percentage of votes of auditors required to approve medium level actions.
 * __auth_threshold_low__ percentage of votes of auditors required to approve lowest level actions.
 * __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.
-* __asset requested_pay_max__
 
 **INTENT:** The intent of {{ updateconfig }} is update the configuration for the running contract of selected parameters without needing change the source code. This requires a privileged account.
 **TERM:** The action sets the configuration until it is set by a subsequent updateconfig action.
@@ -110,7 +109,6 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 ## ACTION: nominatecand
 **PARAMETERS:**
 * __cand__ is an account_name parameter for the nominating candidate.
-* __requestedpay__ is an asset requested by the candidate as pay for being an elected auditor. It should be passed to the action in the format: \"10.0000 BOS\".
 
 **INTENT:** The intent of {{ nominatecand }} is to nominates a candidate to auditor election, Accounts must nominate as a candidate before they can be voted for. The candidate must lock a configurable number of tokens before trying to nominate (configurable via {{ updateconfig }} in the parameter lockupasset which will be sent from the token contract as defined and set in the code of the contract. If a user previously been a candidate they may have enough staked tokens to not require further staking but will otherwise need to transfer the difference to meet the required stake.
 
@@ -144,7 +142,6 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 ## ACTION: updatereqpay
 **PARAMETERS:**
 * __cand__ is an account_name parameter for the nominating candidate.
-* __requestedpay__ is an asset requested by the candidate as pay for being an elected auditor. It should be passed to the action in the format: \"10.0000 BOS\".
 
 **INTENT:** The intent of updatereqpay is to allow a candidate update their requested pay after they have nominated. The action ensures the user has agreed to the latest terms and conditions, has the correct authorization of the {{ cand }} to perform the action and is already nominated as a candidate.  All other data of the candidate will remain unchanged. If the auditor is elected, this requested pay is used along with other elected auditors requested pay to determine the level of pay for auditors
 
@@ -188,11 +185,10 @@ The intent of forehand is to set a candidate to a state of inactive so they will
  * The action is not called before the period should have ended
  * Enough voter value has participated to trigger the initial running of the BOS
  * After BOS auditors has started enough voter value has continued engagement with the BOS auditor voting process.
-1. Calculate the mean `requestedpay` of all the currently elected auditors.
-2. Distribute the median pay amount to all the currently elected auditors. This is achieved by adding a record to the `pendingpay` table with the auditor and the amount payable in preparation for an authorised action to `claimpay`.
-3. Captures the highest voted candidates to set them as the auditors for the next period based on the accumulated vote weight.
-4. Set the permissions for the elected auditors so they have sufficient permission to run the BOS auditor permission according to the constitution and technical permissions design.
-5. Set the time for the beginning of the next period to mark the reset anniversary for the BOS auditor elections.
+1. Distribute the median pay amount to all the currently elected auditors. This is achieved by adding a record to the `pendingpay` table with the auditor and the amount payable in preparation for an authorised action to `claimpay`.
+2. Captures the highest voted candidates to set them as the auditors for the next period based on the accumulated vote weight.
+3. Set the permissions for the elected auditors so they have sufficient permission to run the BOS auditor permission according to the constitution and technical permissions design.
+4. Set the time for the beginning of the next period to mark the reset anniversary for the BOS auditor elections.
 
 **TERM:** The action changes the relevant contract data until a subsequent newperiod is called.
 

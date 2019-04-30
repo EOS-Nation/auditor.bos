@@ -13,7 +13,7 @@ void auditor::nominatecand(name cand) {
         eosio_assert(!reg_candidate->is_active, "ERR::NOMINATECAND_ALREADY_REGISTERED::Candidate is already registered and active.");
         registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
             c.is_active = 1;
-            c.requestedpay = configs().custpay;
+            c.auditor_pay = configs().auditor_pay;
 
             if (pending != pendingstake.end()) {
                 c.locked_tokens += pending->quantity;
@@ -28,7 +28,7 @@ void auditor::nominatecand(name cand) {
 
         registered_candidates.emplace(cand, [&](candidate &c) {
             c.candidate_name = cand;
-            c.requestedpay = configs().custpay;
+            c.auditor_pay = configs().auditor_pay;
             c.locked_tokens = pending->quantity;
             c.total_votes = 0;
             c.is_active = 1;
