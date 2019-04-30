@@ -9,14 +9,13 @@ void auditor::distributePay() {
                 p.key = pending_pay.available_primary_key();
                 p.receiver = cust.cust_name;
                 p.quantity = medianAsset;
-                p.memo = "Custodian pay. Thank you.";
+                p.memo = "Auditor pay. Thank you.";
             });
-        } 
+        }
     }
 
     print("distribute pay");
 }
-
 
 void auditor::assertPeriodTime() {
     uint32_t timestamp = now();
@@ -160,8 +159,6 @@ void auditor::newperiod(string message) {
 
     print("Start");
 
-    print("Start");
-
     assertPeriodTime();
 
     print("\nPeriodTime");
@@ -172,7 +169,7 @@ void auditor::newperiod(string message) {
 
     // Get the max supply of the lockup asset token (eg. BOS)
     auto tokenStats = stats(name(TOKEN_CONTRACT), config.lockupasset.symbol.code().raw()).begin();
-    
+
     uint64_t max_supply = tokenStats->supply.amount;
 
     print("\nRead stats");

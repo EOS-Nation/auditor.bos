@@ -29,30 +29,26 @@ using namespace eosio;
 using namespace std;
 
 struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
-//    The amount of assets that are locked up by each candidate applying for election.
+    //    The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
 
-//    NEW: The pay allocated for each custodian per period
+    //    NEW: The pay allocated for each custodian per period
     asset custpay;
 
-//    The maximum number of votes that each member can make for a candidate.
+    //    The maximum number of votes that each member can make for a candidate.
     uint8_t maxvotes = 5;
-//    Number of custodians to be elected for each election count.
+
+    //    Number of custodians to be elected for each election count.
     uint8_t numelected = 3;
-//    Length of a period in seconds.
-//     - used for pay calculations if an eary election is called and to trigger deferred `newperiod` calls.
+
+    //    Length of a period in seconds.
+    //     - used for pay calculations if an eary election is called and to trigger deferred `newperiod` calls.
     uint32_t periodlength = 7 * 24 * 60 * 60;
     // account to have active auth set with all all custodians on the newperiod.
     name authaccount = name{0};
 
-    // The contract that holds the fund for the DAC. This is used as the source for custodian pay.
-    name tokenholder = "bosauditfund"_n; //TODO: Update this to BOS designated account
-
-    // The contract that will act as the service provider account for the dac. This is used as the source for custodian pay.
-    name serviceprovider;
-
-    // The contract will direct all payments via the service provider.
-    bool should_pay_via_service_provider;
+    // The contract that holds the fund for the BOS auditor pay. This is used as the source for auditor pay.
+    name tokenholder = "auditpay.bos"_n;
 
     // Amount of token value in votes required to trigger the initial set of custodians
     uint32_t initial_vote_quorum_percent;
@@ -71,22 +67,20 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     asset requested_pay_max;
 
     EOSLIB_SERIALIZE(contr_config,
-                             (lockupasset)
-                             (custpay)
-                             (maxvotes)
-                             (numelected)
-                             (periodlength)
-                             (authaccount)
-                             (tokenholder)
-                             (serviceprovider)
-                             (should_pay_via_service_provider)
-                             (initial_vote_quorum_percent)
-                             (vote_quorum_percent)
-                             (auth_threshold_high)
-                             (auth_threshold_mid)
-                             (auth_threshold_low)
-                             (lockup_release_time_delay)
-                             (requested_pay_max)
+                    (lockupasset)
+                    (custpay)
+                    (maxvotes)
+                    (numelected)
+                    (periodlength)
+                    (authaccount)
+                    (tokenholder)
+                    (initial_vote_quorum_percent)
+                    (vote_quorum_percent)
+                    (auth_threshold_high)
+                    (auth_threshold_mid)
+                    (auth_threshold_low)
+                    (lockup_release_time_delay)
+                    (requested_pay_max)
     )
 };
 
