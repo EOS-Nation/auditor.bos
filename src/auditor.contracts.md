@@ -108,7 +108,7 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 
 ## ACTION: nominatecand
 
-### Auditor’s Declaration of Independence and Impartiality
+### V1.0 Auditor’s Declaration of Independence and Impartiality
 
 I, {{ nominatecand }}, accept to serve as Auditor, in accordance with the BOS Rules.
 
