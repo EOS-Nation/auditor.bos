@@ -107,6 +107,20 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 </h1>
 
 ## ACTION: nominatecand
+
+### Auditor’s Declaration of Independence and Impartiality
+
+I, {{ nominatecand }}, accept to serve as Auditor, in accordance with the BOS Rules.
+
+I
+**DECLARE** to be and to intend to remain independent and impartial during the auditing procedure.
+
+**DECLARE** that, to my knowledge, there are no facts, circumstances or relationships which may affect my independence and impartiality.
+
+**DECLARE** to treat all BOS members fairly, reward contributions appropriately and not seek unmerited profits. No member should have less or more information about an auditing decision than others.
+
+**DECLARE** not to seek any stake in, or exert undue influence over, other block producers and shall take appropriate measures to protect my own independence and impartiality.
+
 **PARAMETERS:**
 * __cand__ is an account_name parameter for the nominating candidate.
 
