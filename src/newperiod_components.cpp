@@ -94,8 +94,8 @@ void auditor::setCustodianAuths() {
         accounts.push_back(account);
     }
 
-    eosiosystem::authority high_contract_authority{
-            .threshold = configs().auth_threshold_high,
+    eosiosystem::authority auditors_contract_authority{
+            .threshold = configs().auth_threshold_auditors,
             .keys = {},
             .accounts = accounts
     };
@@ -104,54 +104,9 @@ void auditor::setCustodianAuths() {
            "eosio"_n, "updateauth"_n,
            std::make_tuple(
                    accountToChange,
-                   HIGH_PERMISSION,
+                   AUDITORS_PERMISSION,
                    "owner"_n,
-                   high_contract_authority))
-            .send();
-
-    eosiosystem::authority medium_contract_authority{
-            .threshold = configs().auth_threshold_mid,
-            .keys = {},
-            .accounts = accounts
-    };
-
-    action(permission_level{accountToChange, "owner"_n},
-            "eosio"_n, "updateauth"_n,
-           std::make_tuple(
-                   accountToChange,
-                   MEDIUM_PERMISSION,
-                   "high"_n,
-                   medium_contract_authority))
-            .send();
-
-    eosiosystem::authority low_contract_authority{
-            .threshold = configs().auth_threshold_low,
-            .keys = {},
-            .accounts = accounts
-    };
-
-    action(permission_level{accountToChange, "owner"_n},
-            "eosio"_n, "updateauth"_n,
-           std::make_tuple(
-                   accountToChange,
-                   LOW_PERMISSION,
-                   "med"_n,
-                   low_contract_authority))
-            .send();
-
-    eosiosystem::authority one_contract_authority{
-            .threshold = 1,
-            .keys = {},
-            .accounts = accounts
-    };
-
-    action(permission_level{accountToChange, "owner"_n},
-            "eosio"_n, "updateauth"_n,
-           std::make_tuple(
-                   accountToChange,
-                   ONE_PERMISSION,
-                   "low"_n,
-                   one_contract_authority))
+                   auditors_contract_authority))
             .send();
 }
 

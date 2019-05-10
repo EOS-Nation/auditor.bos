@@ -94,9 +94,7 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 * __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,
 * __tokenholder__ The account that controls the funds for the DAC.
 * __initial_vote_quorum_percent__ The percent of voters required to activate the DAC for the first election period.
-* __auth_threshold_high__ percentage of votes of auditors required to approve highest level actions.
-* __auth_threshold_mid__ percentage of votes of auditors required to approve medium level actions.
-* __auth_threshold_low__ percentage of votes of auditors required to approve lowest level actions.
+* __auth_threshold_auditors__ percentage of votes of auditors required to approve lowest level actions.
 * __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.
 
 **INTENT:** The intent of {{ updateconfig }} is update the configuration for the running contract of selected parameters without needing change the source code. This requires a privileged account.

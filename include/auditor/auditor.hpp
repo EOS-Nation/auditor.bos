@@ -20,10 +20,7 @@
 #define TRANSFER_DELAY 60*60
 #endif
 
-const name ONE_PERMISSION = "one"_n;
-const name LOW_PERMISSION = "low"_n;
-const name MEDIUM_PERMISSION = "med"_n;
-const name HIGH_PERMISSION = "high"_n;
+const name AUDITORS_PERMISSION = "auditors"_n;
 
 using namespace eosio;
 using namespace std;
@@ -36,10 +33,10 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     asset auditor_pay;
 
     // The maximum number of votes that each member can make for a candidate.
-    uint8_t maxvotes = 5;
+    uint8_t maxvotes = 3;
 
     // Number of custodians to be elected for each election count.
-    uint8_t numelected = 3;
+    uint8_t numelected = 5;
 
     // Length of a period in seconds.
     // - used for pay calculations if an eary election is called and to trigger deferred `newperiod` calls.
@@ -58,9 +55,7 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     uint32_t vote_quorum_percent;
 
     // required number of custodians required to approve different levels of authenticated actions.
-    uint8_t auth_threshold_high;
-    uint8_t auth_threshold_mid;
-    uint8_t auth_threshold_low;
+    uint8_t auth_threshold_auditors;
 
     // The time before locked up stake can be released back to the candidate using the unstake action
     uint32_t lockup_release_time_delay;
@@ -75,9 +70,7 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
                     (tokenholder)
                     (initial_vote_quorum_percent)
                     (vote_quorum_percent)
-                    (auth_threshold_high)
-                    (auth_threshold_mid)
-                    (auth_threshold_low)
+                    (auth_threshold_auditors)
                     (lockup_release_time_delay)
     )
 };

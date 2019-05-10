@@ -42,9 +42,7 @@ The median pay is to be paid to elected auditors at the end of each period. If a
 - tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
 - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
 - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
-- auth_threshold_high (uint8) - Number of auditors required to approve highest level actions.
-- auth_threshold_mid (uint8) - Number of auditors required to approve highest level actions.
-- auth_threshold_low (uint8) - Number of auditors required to approve highest level actions.
+- auth_threshold_auditors (uint8) - Number of auditors required to approve the lowest level actions.
 - lockup_release_time_delay (date) - The time before locked up stake can be released back to the candidate using the unstake action
 
 ## Actions
@@ -216,9 +214,7 @@ The parameters are:
 - tokenholder(name) : The account that controls the funds for BOS.
 - initial_vote_quorum_percent (uint32) : The percent of voters required to activate BOS for the first election period.
 - vote_quorum_percent (uint32) : The percent of voters required to continue BOS for the following election periods after the first one has activated BOS.
-- auth_threshold_high (uint8) : The number of auditors required to approve an action in the high permission category (exceptional change).
-- auth_threshold_mid (uint8) : The number of auditors required to approve an action in the mid permission category ( extraordinary change).
-- auth_threshold_low (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).
+- auth_threshold_auditors (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).
 
 ---
 

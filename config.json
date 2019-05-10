@@ -1,7 +1,5 @@
 {
-    "auth_threshold_high": 4,
-    "auth_threshold_mid": 3,
-    "auth_threshold_low": 2,
+    "auth_threshold_auditors": 1,
     "authaccount": "auditor.bos",
     "initial_vote_quorum_percent": 15,
     "lockup_release_time_delay": 3600,
