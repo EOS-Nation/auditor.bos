@@ -25,6 +25,18 @@ const name AUDITORS_PERMISSION = "auditors"_n;
 using namespace eosio;
 using namespace std;
 
+/**
+ * - lockupasset (asset) -  The amount of assets that are locked up by each candidate applying for election.
+ * - maxvotes (int default=5) - The maximum number of votes that each member can make for a candidate.
+ * - numelected (int) -  Number of auditors to be elected for each election count.
+ * - periodlength (uint32 =  7 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newperiod` calls.
+ * - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newperiod.
+ * - tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
+ * - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
+ * - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
+ * - auth_threshold_auditors (uint8) - Number of auditors required to approve the lowest level actions.
+ * - lockup_release_time_delay (date) - The time before locked up stake can be released back to the candidate using the unstake action
+ */
 struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     // The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
@@ -99,6 +111,12 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
     return (uint128_t{boolvalue} << 8) | longValue;
 }
 
+/**
+ * - candidate_name (name) - Account name of the candidate (INDEX)
+ * - is_active (int8) - Boolean indicating if the candidate is currently available for election. (INDEX)
+ * - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
+ * - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newperiod` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
+ */
 struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     name candidate_name;
     asset auditor_pay;
@@ -123,6 +141,10 @@ typedef multi_index<"candidates"_n, candidate,
         indexed_by<"byvotesrank"_n, const_mem_fun<candidate, uint64_t, &candidate::by_votes_rank> >
 > candidates_table;
 
+/**
+ * - cust_name (name) - Account name of the auditor (INDEX)
+ * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newperiod` action.
+ */
 struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
     name cust_name;
     asset auditor_pay;
@@ -152,6 +174,11 @@ typedef multi_index<"custodians"_n, custodian,
         indexed_by<"byvotesrank"_n, const_mem_fun<custodian, uint64_t, &custodian::by_votes_rank> >
 > custodians_table;
 
+/**
+ * - voter (account_name) - The account name of the voter (INDEX)
+ * - proxy (account_name) - Name of another voter used to proxy votes through. This should not have a value in both the proxy and candidates at the same time.
+ * - candidates (account_name[]) - The candidates voted for, can supply up to the maximum number of votes (currently 5) - Can be configured via `updateconfig`
+ */
 struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
     name voter;
     name proxy;
@@ -169,6 +196,12 @@ typedef eosio::multi_index<"votes"_n, vote,
         indexed_by<"byproxy"_n, const_mem_fun<vote, uint64_t, &vote::by_proxy> >
 > votes_table;
 
+/**
+ * - key (uint64) -  auto incrementing id to identify a payment due to an auditor
+ * - receiver (account_name) - The account name of the intended receiver.
+ * - quantity (asset) - The amount for the payment.
+ * - memo (string) - A string used in the memo to help the receiver identify it in logs.
+ */
 struct [[eosio::table("pendingpay"), eosio::contract("auditor")]] pay {
     uint64_t key;
     name receiver;
@@ -227,9 +260,37 @@ public:
         contract_state.set(_currentState, _self); // This should not run during a contract_state migration since it will prevent changing the schema with data saved between runs.
     }
 
+    /**
+     * ### updateconfig
+     *
+     * Updates the contract configuration parameters to allow changes without needing to redeploy the source code.
+     *
+     * #### Message
+     *
+     * updateconfig(<params>)
+     *
+     * This action asserts:
+     *
+     * - the message has the permission of the contract account.
+     * - the supplied asset symbol matches the current lockup symbol if it has been previously set or that there have been no 	.
+     *
+     * The parameters are:
+     *
+     * - lockupasset(uint8_t) : defines the asset and amount required for a user to register as a candidate. This is the amount that will be locked up until the user calls `withdrawcand` in order to get the asset returned to them. If there are currently already registered candidates in the contract this cannot be changed to a different asset type because of introduced complexity of handling the staked amounts.
+     * - maxvotes(asset) : Defines the maximum number of candidates a user can vote for at any given time.
+     * - numelected(uint16_t) : The number of candidates to elect for auditors. This is used for the payment amount to auditors for median amount.
+     * - periodlength(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newperiod` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newperiod` action.
+     * - tokcontr(name) : The token contract used to manage the tokens for BOS.
+     * - authaccount(name) : The managing account that controls the BOS auditor permission.
+     * - tokenholder(name) : The account that controls the funds for BOS.
+     * - initial_vote_quorum_percent (uint32) : The percent of voters required to activate BOS for the first election period.
+     * - vote_quorum_percent (uint32) : The percent of voters required to continue BOS for the following election periods after the first one has activated BOS.
+     * - auth_threshold_auditors (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).
+     */
     ACTION updateconfig(contr_config newconfig);
 
-    /** Action to listen to from the associated token contract to ensure registering should be allowed.
+    /**
+     * Action to listen to from the associated token contract to ensure registering should be allowed.
      *
      * @param from The account to observe as the source of funds for a transfer
      * @param to The account to observe as the destination of funds for a transfer
@@ -338,8 +399,8 @@ public:
      *
      *
      * ### Post Condition:
-    Nothing from this action is stored on the blockchain. It is only intended to ensure authentication of changing the bio which will be stored off chain.
-    */
+     * Nothing from this action is stored on the blockchain. It is only intended to ensure authentication of changing the bio which will be stored off chain.
+     */
     ACTION updatebio(name cand, std::string bio);
 
     /**
@@ -362,22 +423,26 @@ public:
 
     /**
      * Refresh vote since `eosio` does not notify this contract
+     *
+     * @param voter - The account id for the voter account.
      */
     ACTION refreshvote(name voter);
 
     /**
-     * This action is to be run to end and begin each period in the DAC life cycle.
-     * It performs multiple tasks for the DAC including:
-     * - Allocate custodians from the candidates tables based on those with most votes at the moment this action is run.
-     * -- This action removes and selects a full set of custodians each time it is successfully run selected from the candidates with the most votes weight. If there are not enough eligible candidates to satisfy the DAC config numbers the action adds the highest voted candidates as custodians as long their votes weight is greater than 0. At this time the held stake for the departing custodians is set to have a time delayed lockup to prevent the funds releasing too soon after each custodian has been in office.
-     * - Distribute pay for the existing custodians based on the configs into the pendingpay table so it can be claimed by individual candidates.
-     * -- The pay is distributed as determined by the median pay of the currently elected custodians. Therefore all elected custodians receive the same pay amount.
-     * - Set the DAC auths for the intended controlling accounts based on the configs thresholds with the newly elected custodians.
-     * This action asserts unless the following conditions have been met:
+     * ### newperiod
+     *
+     * This action is to be run to end and begin each period in BOS life cycle. It performs multiple tasks for BOS including:
+     *
+     * - Allocate auditors from the candidates tables based on those with most votes at the moment this action is run. -- This action removes and selects a full set of auditors each time it is successfully run selected from the candidates with the most votes weight. If there are not enough eligible candidates to satisfy BOS config numbers the action adds the highest voted candidates as auditors as long their votes weight is greater than 0. At this time the held stake for the departing auditors is set to have a time delayed lockup to prevent the funds from releasing too soon after each auditor has been in office.
+     * - Distribute pay for the existing auditors based on the configs into the pending pay table so it can be claimed by individual candidates. -- The pay is distributed as determined by the median pay of the currently elected auditors. Therefore all elected auditors receive the same pay amount.
+     * - Set BOS auths for the intended controlling accounts based on the configs thresholds with the newly elected auditors. This action asserts unless the following conditions have been met:
      * - The action cannot be called multiple times within the period since the last time it was previously run successfully. This minimum time between allowed calls is configured by the period length parameter in contract configs.
-     * - To run for the first time a minimum threshold of voter engragement must be satisfied. This is configured by the `initial_vote_quorum_percent` field in the contract config with the percentage calculated from the amount of registered votes cast by voters against the max supply of tokens for DAC's primary currency.
-     * - After the initial vote quorum percent has been reached subsequent calls to this action will require a minimum of `vote_quorum_percent` to vote for the votes to be considered sufficient to trigger a new period with new custodians.
-     * @param message - a string that be used to log a message in the chain history logs. It serves no function in the contract logic.
+     * - To run for the first time a minimum threshold of voter engagement must be satisfied. This is configured by the `initial_vote_quorum_percent` field in the contract config with the percentage calculated from the amount of registered votes cast by voters against the max supply of tokens for BOS's primary currency.
+     * - After the initial vote quorum percent has been reached subsequent calls to this action will require a minimum of `vote_quorum_percent` to vote for the votes to be considered sufficient to trigger a new period with new auditors.
+     *
+     * ##### Parameters:
+     *
+     * message - a string that is used to log a message in the chain history logs. It serves no function in the contract logic.
      */
     ACTION newperiod(std::string message);
 

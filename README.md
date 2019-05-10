@@ -1,16 +1,17 @@
 # `auditor.bos` - BOS Auditor Elections Contract
 
-This contract will be in charge of auditor registration and voting for candidates.  It will also contain a function which could be called periodically to update the auditor set, and allocate payments.
+This contract will be in charge of auditor registration and voting for BOS auditors.  It will also contain a function which could be called periodically to update the auditor set, and allocate payments.
 
-When a candidate registers, they need to provide a set of configuration variables which will include things like their requested pay.  The system will select the median requested pay when choosing the actual pay.
-The median pay is to be paid to elected auditors at the end of each period. If an elected auditor resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the auditor board from the votes ranking in the candidates at that moment.
+When an auditor registers, they need to provide their bio by calling the `updatebio` action.
+
+If an elected auditor resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the auditor board from the votes ranking in the candidates at that moment.
 
 ## Tables
 
 ### candidates
 
 - candidate_name (name)   - Account name of the candidate (INDEX)
-- isactive (int8) 			- Boolean indicating if the candidate is currently available for election. (INDEX)
+- is_active (int8) - Boolean indicating if the candidate is currently available for election. (INDEX)
 - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
 - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newperiod` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
 
@@ -126,25 +127,6 @@ Update the bio for this candidate / auditor. This will be available on the accou
 
 ---
 
-### updatereqpay
-
-This action is used to update the requested pay for a candidate.
-
-##### Assertions:
-
--   The `cand` account performing the action is authorised to do so.
--   The candidate is currently registered as a candidate.
-
-##### Parameters:
-
-     cand          - The account id for the candidate nominating.
-
-##### Post Condition:
-
-The requested pay for the candidate should be updated to the new asset.
-
----
-
 ### votecust
 
 This action is to facilitate voting for candidates to become auditors of BOS. Each member will be able to vote a configurable number of auditors set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
@@ -168,26 +150,13 @@ An active vote record for the voter will have been created or modified to reflec
 
 ---
 
-### voteproxy ( inactive development at the moment to reduce scope for the initial release)
+### refreshvote
 
-Create/update the active vote to proxy through another voter. This vote will overwrite any existing vote for either a auditor vote or proxy vote.
+Refresh vote since `eosio` does not notify this contract
 
-#### Message
+#### Parameters:
 
-```c
-account (account_name)
-proxy (account_name)
-````
-
-This action asserts:
-
- - the message has the permission of the account registering.
- - the `cand` account is currently registered.
- - the account has agreed to the current terms.
- - the vote is not proxying to themselves as a proxy.
- - the vote is not proxying to another proxy.
-
-Save the votes in the `votes` table, update if the voting account already has a record.
+    voter - The account id for the voter account.
 
 ---
 ### updateconfig
