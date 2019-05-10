@@ -100,12 +100,12 @@ void auditor::setCustodianAuths() {
             .accounts = accounts
     };
 
-    action(permission_level{accountToChange, "owner"_n},
+    action(permission_level{accountToChange, "active"_n},
            "eosio"_n, "updateauth"_n,
            std::make_tuple(
                    accountToChange,
                    AUDITORS_PERMISSION,
-                   "owner"_n,
+                   "active"_n,
                    auditors_contract_authority))
             .send();
 }
