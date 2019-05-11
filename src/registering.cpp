@@ -109,7 +109,7 @@ void auditor::removeCandidate(name cand, bool lockupStake) {
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::REMOVECANDIDATE_NOT_CURRENT_CANDIDATE::Candidate is not already registered.");
 
     eosio::print("Remove from nominated candidate by setting them to inactive.");
-    // Set the is_active flag to false instead of deleting in order to retain votes if they return to he dac.
+    // Set the is_active flag to false instead of deleting in order to retain votes if they return as BOS auditors.
     registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
         c.is_active = 0;
         if (lockupStake) {

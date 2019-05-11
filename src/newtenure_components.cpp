@@ -131,7 +131,7 @@ void auditor::newtenure(string message) {
     // Set custodians for the next period.
     allocateCustodians(false);
 
-    // Set the auths on the dacauthority account
+    // Set the auths on the BOS auditor authority account
     setCustodianAuths();
 
     _currentState.lastperiodtime = now();

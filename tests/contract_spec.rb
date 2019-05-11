@@ -49,7 +49,7 @@ def configure_wallet
 end
 
 # @param [eos account name for the new account] name
-# @param [if not nil amount of eosdac to issue to the new account] issue
+# @param [if not nil amount of BOS to issue to the new account] issue
 # @param [if not nil register the account with the agreed terms as this value] memberreg
 # @param [if not nil transfer this amount to the elections contract so they can register as an election candidate] stake
 # @param [if not nil register as a candidate with this amount as the requested pay] requestedpay
@@ -422,7 +422,6 @@ describe "eosdacelect" do
             {
               "rows": [{
                 "voter": "voter1",
-                "proxy": "",
                 "weight": 30200000,
                 "candidates": [
                   "votedcust1",
@@ -431,7 +430,6 @@ describe "eosdacelect" do
                 ]
               }, {
                 "voter": "voter2",
-                "proxy": "",
                 "weight": 1280000,
                 "candidates": [
                   "votedcust1",
@@ -482,7 +480,6 @@ describe "eosdacelect" do
             {
               "rows": [{
                 "voter": "voter1",
-                "proxy": "",
                 "weight": 30200000,
                 "candidates": [
                   "votedcust1",
@@ -550,7 +547,6 @@ describe "eosdacelect" do
             {
               "rows": [{
                 "voter": "voter1",
-                "proxy": "",
                 "weight": 30200000,
                 "candidates": [
                   "votedcust1",

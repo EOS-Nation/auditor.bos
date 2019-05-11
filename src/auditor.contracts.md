@@ -89,10 +89,10 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 **PARAMETERS:**
 * __lockupasset__ is an asset to be locked up as part of the nominating process for a auditor passed to the action in the format: \"10.0000 BOS\". default value: \"10.0000 BOS\"
 * __maxvotes__ is a integer to configure the maximum number of allowed votes for a nominated member in any single voting action. The default value is 5.
-* __numelected__ is a integer to configure the number of candidates that will be elected as auditors of the DAC. default value is 12.
+* __numelected__ is a integer to configure the number of candidates that will be elected as auditors of BOS. default value is 12.
 * __auditor_tenure__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.
 * __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,
-* __initial_vote_quorum_percent__ The percent of voters required to activate the DAC for the first election period.
+* __initial_vote_quorum_percent__ The percent of voters required to activate BOS auditors for the first election period.
 * __auth_threshold_auditors__ percentage of votes of auditors required to approve lowest level actions.
 * __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.
 
@@ -167,22 +167,9 @@ I
 * __voter__ is an eosio account_name parameter for the voting member.
 * __newvotes__ is an array of nominated candidates account names that the voter intends to vote for with a maximum number of votes as configured by the contract.
 
-**INTENT:** The intent of votecust is to allow a member of the DAC to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election. This action will replace an existing vote for a proxy for {{ voter }} if one exists.
+**INTENT:** The intent of votecust is to allow a member of BOS to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election.
 
 **TERM:** The action changes the preferred auditors for an account until superseded by another action.
-
-<h1 class="contract">
-  voteproxy
-</h1>
-
-## ACTION: voteproxy
-**PARAMETERS:**
-* __voter__ is an eosio account_name .
-* __proxy__ is an account name that the voter intends to vote for with a maximum number of votes as configured by the contract.
-
-**INTENT:** The intent of voteproxy is to vote another single voter account that may vote with {{ voter }} weight for auditors as a proxy. The action ensures the {{ voter }} has agreed to the latest terms and conditions and has the correct authorization of the {{ voter }} to place or change an active vote. Upon success this action will either update an existing {{ proxy }} vote or create a new active vote for {{ proxy }}. This action will replace an existing vote for a auditors as created by the votecust action if one exists. This action will fail if {{ voter }} attempts to vote for a user who is already voting for a proxy or if they attempt to proxy vote for themselves.
-
-**TERM:** The action changes the proxy until superseded by another action.
 
 <h1 class="contract">
   newtenure
