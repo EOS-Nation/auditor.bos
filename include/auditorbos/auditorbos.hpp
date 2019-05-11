@@ -132,19 +132,19 @@ typedef multi_index<"candidates"_n, candidate,
 > candidates_table;
 
 /**
- * - cust_name (name) - Account name of the auditor (INDEX)
+ * - auditor_name (name) - Account name of the auditor (INDEX)
  * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.
  */
 struct [[eosio::table("auditors"), eosio::contract("auditorbos")]] auditor {
-    name cust_name;
+    name auditor_name;
     uint64_t total_votes;
 
-    uint64_t primary_key() const { return cust_name.value; }
+    uint64_t primary_key() const { return auditor_name.value; }
 
     uint64_t by_votes_rank() const { return static_cast<uint64_t>(UINT64_MAX - total_votes); }
 
     EOSLIB_SERIALIZE(auditor,
-                     (cust_name)(total_votes))
+                     (auditor_name)(total_votes))
 };
 
 
@@ -318,10 +318,10 @@ public:
      * This action is used to resign as a auditor.
      *
      * ### Assertions:
-     * - The `cust` account performing the action is authorised to do so.
-     * - The `cust` account is currently an elected auditor.
+     * - The `auditor` account performing the action is authorised to do so.
+     * - The `auditor` account is currently an elected auditor.
      *
-     * @param cust - The account id for the candidate nominating.
+     * @param auditor - The account id for the candidate nominating.
      *
      *
      * ### Post Condition:
@@ -332,16 +332,16 @@ public:
      * A replacement auditor will selected from the candidates to fill the missing place (based on vote ranking)
      * then the auths for the controlling BOS auth account will be set for the auditor board.
      */
-    ACTION resigncust(name cust);
+    ACTION resign(name auditor);
 
     /**
      * This action is used to remove a auditor.
      *
      * ### Assertions:
      * - The action is authorised by the mid level of the auth account (currently elected auditor board).
-     * - The `cust` account is currently an elected auditor.
+     * - The `auditor` account is currently an elected auditor.
      *
-     * @param cust - The account id for the candidate nominating.
+     * @param auditor - The account id for the candidate nominating.
      *
      *
      * ### Post Condition:
@@ -350,7 +350,7 @@ public:
      * that time has passed. A replacement auditor will selected from the candidates to fill the missing place (based on vote ranking)
      * then the auths for the controlling BOS auth account will be set for the auditor board.
      */
-    ACTION firecust(name cust);
+    ACTION fireauditor(name auditor);
 
     /**
      * This action is used to update the bio for a candidate.
@@ -387,7 +387,7 @@ public:
      * ### Post Condition:
      * An active vote record for the voter will have been created or modified to reflect the newvotes. Each of the candidates will have their total_votes amount updated to reflect the delta in voter's token balance. Eg. If a voter has 1000 tokens and votes for 5 candidates, each of those candidates will have their total_votes value increased by 1000. Then if they change their votes to now vote 2 different candidates while keeping the other 3 the same there would be a change of -1000 for 2 old candidates +1000 for 2 new candidates and the other 3 will remain unchanged.
      */
-    ACTION votecust(name voter, std::vector<name> newvotes);
+    ACTION voteauditor(name voter, std::vector<name> newvotes);
 
     /**
      * Refresh vote since `eosio` does not notify this contract
@@ -445,9 +445,9 @@ private: // Private helper methods used by other actions.
 
     void setAuditorAuths();
 
-    void removeAuditor(name cust);
+    void removeAuditor(name auditor);
 
-    void removeCandidate(name cust, bool lockupStake);
+    void removeCandidate(name auditor, bool lockupStake);
 
     void allocateAuditors(bool early_election);
 

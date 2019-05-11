@@ -72,29 +72,29 @@ void auditorbos::unstake(name cand) {
     });
 }
 
-void auditorbos::resigncust(name cust) {
-    require_auth(cust);
-    removeAuditor(cust);
+void auditorbos::resign(name auditor) {
+    require_auth(auditor);
+    removeAuditor(auditor);
 }
 
-void auditorbos::firecust(name cust) {
+void auditorbos::fireauditor(name auditor) {
     require_auth(configs().authaccount);
-    removeAuditor(cust);
+    removeAuditor(auditor);
 }
 
 // private methods for the above actions
 
-void auditorbos::removeAuditor(name cust) {
+void auditorbos::removeAuditor(name auditor) {
 
     auditors_table auditors(_self, _self.value);
-    auto elected = auditors.find(cust.value);
+    auto elected = auditors.find(auditor.value);
     eosio_assert(elected != auditors.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current auditor.");
 
     eosio::print("Remove auditor from the auditors table.");
     auditors.erase(elected);
 
     // Remove the candidate from being eligible for the next election period.
-    removeCandidate(cust, true);
+    removeCandidate(auditor, true);
 
     // Allocate the next set of candidates to only fill the gap for the missing slot.
     allocateAuditors(true);

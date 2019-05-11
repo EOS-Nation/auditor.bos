@@ -23,8 +23,8 @@ void auditorbos::updateVoteWeight(name auditor, int64_t weight) {
 }
 
 void auditorbos::updateVoteWeights(const vector<name> &votes, int64_t vote_weight) {
-    for (const auto &cust : votes) {
-        updateVoteWeight(cust, vote_weight);
+    for (const auto &auditor : votes) {
+        updateVoteWeight(auditor, vote_weight);
     }
 
     _currentState.total_votes_on_candidates += votes.size() * vote_weight;

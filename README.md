@@ -17,7 +17,7 @@ If an elected auditor resigns via the `withdrawcand` during a period a new candi
 
 ### auditors
 
-- cust_name (name) - Account name of the auditor (INDEX)
+- auditor_name (name) - Account name of the auditor (INDEX)
 - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.
 
 ### votes
@@ -88,18 +88,18 @@ This action is used to withdraw a candidate from being active for auditor electi
 The candidate should still be present in the candidates table and be set to inactive. If the were recently an elected auditor there may be a time delay on when they can unstake their tokens from the contract. If not they will be able to unstake their tokens immediately using the unstake action.
 
 ---
-### resigncust
+### resign
 
-This action is used to resign as a auditor.
+This action is used to resign as an auditor.
 
 ##### Assertions:
 
--   The `cust` account performing the action is authorised to do so.
--   The `cust` account is currently an elected auditor.
+-   The `auditor` account performing the action is authorised to do so.
+-   The `auditor` account is currently an elected auditor.
 
 ##### Parameters:
 
-    cust  - The account id for the candidate nominating.
+    auditor  - The account id for the candidate nominating.
 
 ##### Post Condition:
 
@@ -125,7 +125,7 @@ Update the bio for this candidate / auditor. This will be available on the accou
 
 ---
 
-### votecust
+### voteauditor
 
 This action is to facilitate voting for candidates to become auditors of BOS. Each member will be able to vote a configurable number of auditors set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
 
@@ -257,14 +257,14 @@ This action is used to remove a candidate from being a candidate for auditor ele
 The candidate should still be present in the candidates table and be set to inactive. If the `lockupstake` parameter is true the stake will be locked until the time delay has passed. If not the candidate will be able to unstake their tokens immediately using the unstake action to have them returned.
 
 ---
-### firecust
+### fireauditor
 
 This action is used to remove a auditor.
 
 ##### Assertions:
 
 -   The action is authorised by the mid level of the auth account (currently elected auditor board).
--   The `cust` account is currently an elected auditor.
+-   The `auditor` account is currently an elected auditor.
 
 ##### Parameters:
 

@@ -8,7 +8,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "cust_name",
+                    "name": "auditor_name",
                     "type": "name"
                 },
                 {
@@ -126,6 +126,16 @@
             ]
         },
         {
+            "name": "fireauditor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "auditor",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "firecand",
             "base": "",
             "fields": [
@@ -136,16 +146,6 @@
                 {
                     "name": "lockupStake",
                     "type": "bool"
-                }
-            ]
-        },
-        {
-            "name": "firecust",
-            "base": "",
-            "fields": [
-                {
-                    "name": "cust",
-                    "type": "name"
                 }
             ]
         },
@@ -180,11 +180,11 @@
             ]
         },
         {
-            "name": "resigncust",
+            "name": "resign",
             "base": "",
             "fields": [
                 {
-                    "name": "cust",
+                    "name": "auditor",
                     "type": "name"
                 }
             ]
@@ -260,7 +260,7 @@
             ]
         },
         {
-            "name": "votecust",
+            "name": "voteauditor",
             "base": "",
             "fields": [
                 {
@@ -286,14 +286,14 @@
     ],
     "actions": [
         {
+            "name": "fireauditor",
+            "type": "fireauditor",
+            "ricardian_contract": "## ACTION: fireauditor\n**PARAMETERS:**\n* __cand__ is an eosio account name.\n\n**INTENT:** The intent of fireauditor is to allow elected auditors to (where quorum and configured majorities are met) to remove a fellow auditor and lock up their tokens until the configured delay period has passed.\n**TERM:** This action lasts for the duration of the time taken to process the transaction."
+        },
+        {
             "name": "firecand",
             "type": "firecand",
             "ricardian_contract": "## ACTION: firecand\n**PARAMETERS:**\n* __cand__ is an eosio account name.\n* __lockupStake__ is an indicator to show whether stake is being locked up or not\n\n**INTENT:**\nThe intent of forehand is to set a candidate to a state of inactive so they will be excluded from the next election round. This action may only be run by the by elected auditors (where quorum and configured majorities are met). There is an option to lock up the candidate's tokens until a delay period has passed based on the delay set in the config after which the tokens can be claimed with the unstake action. If the option passed is false and there is an existing lockup delay on the tokens then this lockup will continue to be active until the lock up time has passed.\n\n**TERM:** This action lasts for the duration of the time taken to process the transaction."
-        },
-        {
-            "name": "firecust",
-            "type": "firecust",
-            "ricardian_contract": "## ACTION: firecust\n**PARAMETERS:**\n* __cand__ is an eosio account name.\n\n**INTENT:** The intent of firecust is to allow elected auditors to (where quorum and configured majorities are met) to remove a fellow auditor and lock up their tokens until the configured delay period has passed.\n**TERM:** This action lasts for the duration of the time taken to process the transaction."
         },
         {
             "name": "newtenure",
@@ -311,9 +311,9 @@
             "ricardian_contract": "## ACTION: refreshvote\n**PARAMETERS:**\n* __voter__ is an eosio account name.\n\n**INTENT** The intent of refreshvote is to update the auditor's vote weight"
         },
         {
-            "name": "resigncust",
-            "type": "resigncust",
-            "ricardian_contract": "## ACTION: resigncust\n**PARAMETERS:**\n* __cust__ is an eosio account name.\n\n**INTENT:** The intent of resigncust is to remove an elected auditor. This action must be run by the resigning auditor and the outcome should remove the elected auditor and lock up their tokens until the delay period has passed so the tokens can be claimed with the unstake action.\n**TERM:** This action lasts for the duration of the time taken to process the transaction."
+            "name": "resign",
+            "type": "resign",
+            "ricardian_contract": "## ACTION: resign\n**PARAMETERS:**\n* __auditor__ is an eosio account name.\n\n**INTENT:** The intent of resign is to remove an elected auditor. This action must be run by the resigning auditor and the outcome should remove the elected auditor and lock up their tokens until the delay period has passed so the tokens can be claimed with the unstake action.\n**TERM:** This action lasts for the duration of the time taken to process the transaction."
         },
         {
             "name": "unstake",
@@ -331,9 +331,9 @@
             "ricardian_contract": "## ACTION: updateconfig\n**PARAMETERS:**\n* __lockupasset__ is an asset to be locked up as part of the nominating process for a auditor passed to the action in the format: \\\"10.0000 BOS\\\". default value: \\\"10.0000 BOS\\\"\n* __maxvotes__ is a integer to configure the maximum number of allowed votes for a nominated member in any single voting action. The default value is 5.\n* __numelected__ is a integer to configure the number of candidates that will be elected as auditors of BOS. default value is 12.\n* __auditor_tenure__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.\n* __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,\n* __initial_vote_quorum_percent__ The percent of voters required to activate BOS auditors for the first election period.\n* __auth_threshold_auditors__ percentage of votes of auditors required to approve lowest level actions.\n* __lockup_release_time_delay__ The time before locked up stake can be released back to the candidate using the unstake action.\n\n**INTENT:** The intent of {{ updateconfig }} is update the configuration for the running contract of selected parameters without needing change the source code. This requires a privileged account.\n**TERM:** The action sets the configuration until it is set by a subsequent updateconfig action."
         },
         {
-            "name": "votecust",
-            "type": "votecust",
-            "ricardian_contract": "## ACTION: votecust\n**PARAMETERS:**\n* __voter__ is an eosio account_name parameter for the voting member.\n* __newvotes__ is an array of nominated candidates account names that the voter intends to vote for with a maximum number of votes as configured by the contract.\n\n**INTENT:** The intent of votecust is to allow a member of BOS to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election.\n\n**TERM:** The action changes the preferred auditors for an account until superseded by another action."
+            "name": "voteauditor",
+            "type": "voteauditor",
+            "ricardian_contract": "## ACTION: voteauditor\n**PARAMETERS:**\n* __voter__ is an eosio account_name parameter for the voting member.\n* __newvotes__ is an array of nominated candidates account names that the voter intends to vote for with a maximum number of votes as configured by the contract.\n\n**INTENT:** The intent of voteauditor is to allow a member of BOS to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election.\n\n**TERM:** The action changes the preferred auditors for an account until superseded by another action."
         },
         {
             "name": "withdrawcand",

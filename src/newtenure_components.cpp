@@ -18,14 +18,14 @@ void auditorbos::allocateAuditors(bool early_election) {
 
     if (!early_election) {
         eosio::print("Empty the auditors table to get a full set of new auditors based on the current votes.");
-        auto cust_itr = auditors.begin();
-        while (cust_itr != auditors.end()) {
-            const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
-            registered_candidates.modify(reg_candidate, cust_itr->cust_name, [&](candidate &c) {
+        auto auditor_itr = auditors.begin();
+        while (auditor_itr != auditors.end()) {
+            const auto &reg_candidate = registered_candidates.get(auditor_itr->auditor_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
+            registered_candidates.modify(reg_candidate, auditor_itr->auditor_name, [&](candidate &c) {
                 eosio::print("Lockup stake for release delay.");
                 c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
             });
-            cust_itr = auditors.erase(cust_itr);
+            auditor_itr = auditors.erase(auditor_itr);
         }
     }
 
@@ -43,7 +43,7 @@ void auditorbos::allocateAuditors(bool early_election) {
             cand_itr++;
         } else {
             auditors.emplace(_self, [&](auditor &c) {
-                c.cust_name = cand_itr->candidate_name;
+                c.auditor_name = cand_itr->candidate_name;
                 c.total_votes = cand_itr->total_votes;
             });
 
@@ -68,7 +68,7 @@ void auditorbos::setAuditorAuths() {
 
     for (auto it = auditors.begin(); it != auditors.end(); it++) {
         eosiosystem::permission_level_weight account{
-                .permission = eosio::permission_level(it->cust_name, "active"_n),
+                .permission = eosio::permission_level(it->auditor_name, "active"_n),
                 .weight = (uint16_t) 1,
         };
         accounts.push_back(account);

@@ -762,16 +762,16 @@ describe "eosdacelect" do
           json = JSON.parse(subject.stdout)
           expect(json["rows"].count).to eq 12
 
-          custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
+          custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate11'}
           expect(custodian["total_votes"]).to eq 1280000
 
-          custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate32'}
+          custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate32'}
           expect(custodian["total_votes"]).to eq 15001500000
 
-          custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
+          custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate4'}
           expect(custodian["total_votes"]).to eq 168100000
 
-          custnames = json["rows"].map {|c| c["cust_name"]}
+          custnames = json["rows"].map {|c| c["auditor_name"]}
           expect(custnames).to eq ["allocate1", "allocate11", "allocate12", "allocate2", "allocate21", "allocate22", "allocate3", "allocate31", "allocate32", "allocate4", "allocate41", "allocate5"]
         end
       end
@@ -879,16 +879,16 @@ describe "eosdacelect" do
         json = JSON.parse(subject.stdout)
         expect(json["rows"].count).to eq 12
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate11'}
         expect(custodian["total_votes"]).to eq 1280000
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate1'}
         expect(custodian["total_votes"]).to eq '15030400000'
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate4'}
         expect(custodian["total_votes"]).to eq '15030400000'
 
-        custnames = json["rows"].map {|c| c["cust_name"]}
+        custnames = json["rows"].map {|c| c["auditor_name"]}
 
         # allocate32 was dropped and then allocate51 took the spot
         expect(custnames).to eq ["allocate1", "allocate11", "allocate12", "allocate2", "allocate21", "allocate22", "allocate3", "allocate31", "allocate4", "allocate41", "allocate5", "allocate51"]
@@ -987,17 +987,17 @@ describe "eosdacelect" do
 
   describe "resign cust" do
     context "with invalid auth" do
-      command %(cleos push action daccustodian resigncust '{ "cust": "allocate31"}' -p allocate3), allow_error: true
+      command %(cleos push action daccustodian resigncust '{ "auditor": "allocate31"}' -p allocate3), allow_error: true
       its(:stderr) {is_expected.to include('missing authority of allocate31')}
     end
 
     context "with a candidate who is not an elected custodian" do
-      command %(cleos push action daccustodian resigncust '{ "cust": "votedcust3"}' -p votedcust3), allow_error: true
+      command %(cleos push action daccustodian resigncust '{ "auditor": "votedcust3"}' -p votedcust3), allow_error: true
       its(:stderr) {is_expected.to include('The entered account name is not for a current custodian.')}
     end
 
     context "when the auth is correct" do
-      command %(cleos push action daccustodian resigncust '{ "cust": "allocate31"}' -p allocate31), allow_error: true
+      command %(cleos push action daccustodian resigncust '{ "auditor": "allocate31"}' -p allocate31), allow_error: true
       its(:stdout) {is_expected.to include('daccustodian::resigncust')}
     end
 
@@ -1022,13 +1022,13 @@ describe "eosdacelect" do
         json = JSON.parse(subject.stdout)
         expect(json["rows"].count).to eq 12
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate11'}
         expect(custodian["total_votes"]).to eq 1280000
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate1'}
         expect(custodian["total_votes"]).to eq '15030400000'
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate4'}
         expect(custodian["total_votes"]).to eq '15030400000'
 
       end
@@ -1136,12 +1136,12 @@ describe "eosdacelect" do
 
   xdescribe "fire custodian" do
     context "with invalid auth" do
-      command %(cleos push action daccustodian firecust '{ "cust": "allocate1"}' -p allocate31), allow_error: true
+      command %(cleos push action daccustodian fireauditor '{ "auditor": "allocate1"}' -p allocate31), allow_error: true
       its(:stderr) {is_expected.to include('missing authority of dacauthority')}
     end
 
     context "with valid auth" do
-      command %(cleos push action daccustodian firecust '{ "cust": "allocate1"}' -p dacauthority), allow_error: true
+      command %(cleos push action daccustodian fireauditor '{ "auditor": "allocate1"}' -p dacauthority), allow_error: true
       its(:stderr) {is_expected.to include('Cannot unstake tokens before they are unlocked from the time delay.')}
     end
 
@@ -1175,13 +1175,13 @@ describe "eosdacelect" do
         json = JSON.parse(subject.stdout)
         expect(json["rows"].count).to eq 12
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate11'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate11'}
         expect(custodian["total_votes"]).to eq 1280000
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate1'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate1'}
         expect(custodian["total_votes"]).to eq 30000000
 
-        custodian = json["rows"].detect {|v| v["cust_name"] == 'allocate4'}
+        custodian = json["rows"].detect {|v| v["auditor_name"] == 'allocate4'}
         expect(custodian["total_votes"]).to eq '15030400000'
 
       end

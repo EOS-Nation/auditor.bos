@@ -41,9 +41,9 @@ extern "C" { \
 
 EOSIO_ABI_EX(auditorbos,
              (updateconfig)
-             (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
+             (nominatecand)(withdrawcand)(firecand)(resign)(fireauditor)(unstake)
              (updatebio)
-             (votecust)(refreshvote)
+             (voteauditor)(refreshvote)
              (newtenure)
              (transfer)
 #ifdef MIGRATE

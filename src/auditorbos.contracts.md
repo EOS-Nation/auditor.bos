@@ -36,24 +36,24 @@ The intent of updatebio is to record an update the user's bio. Unlike `stprofile
  ####Warning: This action will store the content on the chain in the history logs and the data cannot be deleted later.
 
 <h1 class="contract">
- firecust
+ fireauditor
 </h1>
 
-## ACTION: firecust
+## ACTION: fireauditor
 **PARAMETERS:**
 * __cand__ is an eosio account name.
 
-**INTENT:** The intent of firecust is to allow elected auditors to (where quorum and configured majorities are met) to remove a fellow auditor and lock up their tokens until the configured delay period has passed.
+**INTENT:** The intent of fireauditor is to allow elected auditors to (where quorum and configured majorities are met) to remove a fellow auditor and lock up their tokens until the configured delay period has passed.
 **TERM:** This action lasts for the duration of the time taken to process the transaction.
 
 <h1 class="contract">
-  resigncust
+  resign
 </h1>
- ## ACTION: resigncust
+ ## ACTION: resign
 **PARAMETERS:**
-* __cust__ is an eosio account name.
+* __auditor__ is an eosio account name.
 
-**INTENT:** The intent of resigncust is to remove an elected auditor. This action must be run by the resigning auditor and the outcome should remove the elected auditor and lock up their tokens until the delay period has passed so the tokens can be claimed with the unstake action.
+**INTENT:** The intent of resign is to remove an elected auditor. This action must be run by the resigning auditor and the outcome should remove the elected auditor and lock up their tokens until the delay period has passed so the tokens can be claimed with the unstake action.
 **TERM:** This action lasts for the duration of the time taken to process the transaction.
 
 <h1 class="contract">
@@ -159,15 +159,15 @@ I
 **TERM:** The action changes the values until superseded by another action.
 
 <h1 class="contract">
-  votecust
+  voteauditor
 </h1>
 
-## ACTION: votecust
+## ACTION: voteauditor
 **PARAMETERS:**
 * __voter__ is an eosio account_name parameter for the voting member.
 * __newvotes__ is an array of nominated candidates account names that the voter intends to vote for with a maximum number of votes as configured by the contract.
 
-**INTENT:** The intent of votecust is to allow a member of BOS to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election.
+**INTENT:** The intent of voteauditor is to allow a member of BOS to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election.
 
 **TERM:** The action changes the preferred auditors for an account until superseded by another action.
 
