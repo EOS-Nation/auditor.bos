@@ -250,6 +250,10 @@
                     "type": "name"
                 },
                 {
+                    "name": "proxy",
+                    "type": "name"
+                },
+                {
                     "name": "weight",
                     "type": "uint64"
                 },

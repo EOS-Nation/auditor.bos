@@ -70,6 +70,7 @@ void auditorbos::modifyVoteWeights(name voter, vector<name> newVotes) {
         } else {
             votes_cast_by_members.modify(existingVote, voter, [&](vote &v) {
                 v.candidates = newVotes;
+                v.proxy = name();
                 v.weight = vote_weight;
             });
         }

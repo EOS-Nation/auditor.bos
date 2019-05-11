@@ -169,15 +169,20 @@ typedef multi_index<"auditors"_n, auditor,
  */
 struct [[eosio::table("votes"), eosio::contract("auditorbos")]] vote {
     name voter;
+    name proxy;
     uint64_t weight;
     std::vector<name> candidates;
 
     uint64_t primary_key() const { return voter.value; }
+    uint64_t by_proxy() const { return proxy.value; }
 
-    EOSLIB_SERIALIZE(vote, (voter)(weight)(candidates))
+
+    EOSLIB_SERIALIZE(vote, (voter)(proxy)(weight)(candidates))
 };
 
-typedef eosio::multi_index<"votes"_n, vote> votes_table;
+typedef eosio::multi_index<"votes"_n, vote,
+        indexed_by<"byproxy"_n, const_mem_fun<vote, uint64_t, &vote::by_proxy> >
+> votes_table;
 
 struct [[eosio::table("pendingstake"), eosio::contract("auditorbos")]] tempstake {
     name sender;
