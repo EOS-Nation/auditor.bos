@@ -90,7 +90,7 @@ The intent of forehand is to set a candidate to a state of inactive so they will
 * __lockupasset__ is an asset to be locked up as part of the nominating process for a auditor passed to the action in the format: \"10.0000 BOS\". default value: \"10.0000 BOS\"
 * __maxvotes__ is a integer to configure the maximum number of allowed votes for a nominated member in any single voting action. The default value is 5.
 * __numelected__ is a integer to configure the number of candidates that will be elected as auditors of the DAC. default value is 12.
-* __periodlength__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.
+* __auditor_tenure__ the length of office of a auditor vote (in seconds) before a new period . Default to 7 days.
 * __authaccount__ The authorised account to change the contract which should be protected via a multisig of auditors,
 * __tokenholder__ The account that controls the funds for the DAC.
 * __initial_vote_quorum_percent__ The percent of voters required to activate the DAC for the first election period.

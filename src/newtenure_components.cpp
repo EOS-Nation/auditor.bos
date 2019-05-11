@@ -20,8 +20,8 @@ void auditor::distributePay() {
 void auditor::assertPeriodTime() {
     uint32_t timestamp = now();
     uint32_t periodBlockCount = timestamp - _currentState.lastperiodtime;
-    eosio_assert(periodBlockCount > configs().periodlength,
-                 "ERR::NEWPERIOD_EARLY::New period is being called too soon. Wait until the period has completed.");
+    eosio_assert(periodBlockCount > configs().auditor_tenure,
+                 "ERR::NEWTENURE_EARLY::New period is being called too soon. Wait until the period has completed.");
 }
 
 void auditor::allocateCustodians(bool early_election) {
@@ -39,7 +39,7 @@ void auditor::allocateCustodians(bool early_election) {
         eosio::print("Empty the custodians table to get a full set of new custodians based on the current votes.");
         auto cust_itr = custodians.begin();
         while (cust_itr != custodians.end()) {
-            const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWPERIOD_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
+            const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
             registered_candidates.modify(reg_candidate, cust_itr->cust_name, [&](candidate &c) {
                 eosio::print("Lockup stake for release delay.");
                 c.custodian_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
@@ -110,7 +110,7 @@ void auditor::setCustodianAuths() {
             .send();
 }
 
-void auditor::newperiod(string message) {
+void auditor::newtenure(string message) {
 
     print("Start");
 
@@ -142,11 +142,11 @@ void auditor::newperiod(string message) {
 
     eosio_assert(_currentState.met_initial_votes_threshold == true ||
                  percent_of_current_voter_engagement > config.initial_vote_quorum_percent,
-                 "ERR::NEWPERIOD_VOTER_ENGAGEMENT_LOW_ACTIVATE::Voter engagement is insufficient to activate the Audit Cycle..");
+                 "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_ACTIVATE::Voter engagement is insufficient to activate the Audit Cycle..");
     _currentState.met_initial_votes_threshold = true;
 
     eosio_assert(percent_of_current_voter_engagement > config.vote_quorum_percent,
-                 "ERR::NEWPERIOD_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
+                 "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
 
     // Distribute pay to the current custodians.
     distributePay();
@@ -162,7 +162,7 @@ void auditor::newperiod(string message) {
 
 //        Schedule the the next election cycle at the end of the period.
 //        transaction nextTrans{};
-//        nextTrans.actions.emplace_back(permission_level(_self,N(active)), _self, N(newperiod), std::make_tuple("", false));
-//        nextTrans.delay_sec = configs().periodlength;
-//        nextTrans.send(N(newperiod), false);
+//        nextTrans.actions.emplace_back(permission_level(_self,N(active)), _self, N(newtenure), std::make_tuple("", false));
+//        nextTrans.delay_sec = configs().auditor_tenure;
+//        nextTrans.send(N(newtenure), false);
 }
