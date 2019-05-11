@@ -19,6 +19,12 @@ $ eosc transfer <CANDIDATE> auditor.bos "100.0000 BOS" -m "stake for auditor.bos
 $ eosc tx create auditor.bos nominatecand '{"cand": "<CANDIDATE>"}' -p <CANDIDATE>@active
 ```
 
+### Vote for Auditor Candidate
+
+```
+$ eosc tx create auditor.bos voteauditor '{"voter":"<VOTER>","newvotes":["<CANDIDATE_1>", "<CANDIDATE_2>","<CANDIDATE_3>"]}' -p deniscarrier
+```
+
 ### Withdraw Candidate & Unstake
 
 > A Candidate must `withdrawcand` to be allowed to `unstake` any BOS assets that was sent to `auditor.bos`.
@@ -26,6 +32,14 @@ $ eosc tx create auditor.bos nominatecand '{"cand": "<CANDIDATE>"}' -p <CANDIDAT
 ```
 $ eosc tx create auditor.bos withdrawcand '{"cand":"<CANDIDATE>"}' -p <CANDIDATE>
 $ eosc tx create auditor.bos unstake '{"cand":"<CANDIDATE>"}' -p <CANDIDATE>
+```
+
+### Resign as Auditor
+
+> Removes elected auditor from `auditor.bos@auditors`
+
+```
+$ eosc tx create auditor.bos resign '{"auditor":"<AUDITOR>"}' -p <AUDITOR>
 ```
 
 ### Start Auditor Tenure (Election)
