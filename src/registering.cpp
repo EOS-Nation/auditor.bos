@@ -74,33 +74,33 @@ void auditor::unstake(name cand) {
 
 void auditor::resigncust(name cust) {
     require_auth(cust);
-    removeCustodian(cust);
+    removeAuditor(cust);
 }
 
 void auditor::firecust(name cust) {
     require_auth(configs().authaccount);
-    removeCustodian(cust);
+    removeAuditor(cust);
 }
 
 // private methods for the above actions
 
-void auditor::removeCustodian(name cust) {
+void auditor::removeAuditor(name cust) {
 
     custodians_table custodians(_self, _self.value);
     auto elected = custodians.find(cust.value);
-    eosio_assert(elected != custodians.end(), "ERR::REMOVECUSTODIAN_NOT_CURRENT_CUSTODIAN::The entered account name is not for a current custodian.");
+    eosio_assert(elected != custodians.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current custodian.");
 
-    eosio::print("Remove custodian from the custodians table.");
+    eosio::print("Remove auditor from the auditors table.");
     custodians.erase(elected);
 
     // Remove the candidate from being eligible for the next election period.
     removeCandidate(cust, true);
 
     // Allocate the next set of candidates to only fill the gap for the missing slot.
-    allocateCustodians(true);
+    allocateAuditors(true);
 
-    // Update the auths to give control to the new set of custodians.
-    setCustodianAuths();
+    // Update the auths to give control to the new set of auditors.
+    setAuditorAuths();
 }
 
 void auditor::removeCandidate(name cand, bool lockupStake) {

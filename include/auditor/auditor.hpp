@@ -43,23 +43,23 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     // The maximum number of votes that each member can make for a candidate.
     uint8_t maxvotes = 3;
 
-    // Number of custodians to be elected for each election count.
+    // Number of auditors to be elected for each election count.
     uint8_t numelected = 5;
 
     // Length of a period in seconds.
     // - used for pay calculations if an eary election is called and to trigger deferred `newtenure` calls.
     uint32_t auditor_tenure = 90 * 24 * 60 * 60;
 
-    // account to have active auth set with all all custodians on the newtenure.
+    // account to have active auth set with all all auditors on the newtenure.
     name authaccount = name{0};
 
-    // Amount of token value in votes required to trigger the initial set of custodians
+    // Amount of token value in votes required to trigger the initial set of auditors
     uint32_t initial_vote_quorum_percent;
 
-    // Amount of token value in votes required to trigger the allow a new set of custodians to be set after the initial threshold has been achieved.
+    // Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
     uint32_t vote_quorum_percent;
 
-    // required number of custodians required to approve different levels of authenticated actions.
+    // required number of auditors required to approve different levels of authenticated actions.
     uint8_t auth_threshold_auditors;
 
     // The time before locked up stake can be released back to the candidate using the unstake action
@@ -443,12 +443,12 @@ private: // Private helper methods used by other actions.
 
     void assertPeriodTime();
 
-    void setCustodianAuths();
+    void setAuditorAuths();
 
-    void removeCustodian(name cust);
+    void removeAuditor(name cust);
 
     void removeCandidate(name cust, bool lockupStake);
 
-    void allocateCustodians(bool early_election);
+    void allocateAuditors(bool early_election);
 
 };

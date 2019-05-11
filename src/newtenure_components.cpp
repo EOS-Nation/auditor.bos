@@ -5,9 +5,9 @@ void auditor::assertPeriodTime() {
                  "ERR::NEWTENURE_EARLY::New period is being called too soon. Wait until the period has completed.");
 }
 
-void auditor::allocateCustodians(bool early_election) {
+void auditor::allocateAuditors(bool early_election) {
 
-    eosio::print("Configure custodians for the next period.");
+    eosio::print("Configure auditors for the next period.");
 
     custodians_table custodians(_self, _self.value);
     auto byvotes = registered_candidates.get_index<"byvotesrank"_n>();
@@ -17,7 +17,7 @@ void auditor::allocateCustodians(bool early_election) {
     uint8_t currentCustodianCount = 0;
 
     if (!early_election) {
-        eosio::print("Empty the custodians table to get a full set of new custodians based on the current votes.");
+        eosio::print("Empty the auditors table to get a full set of new auditors based on the current votes.");
         auto cust_itr = custodians.begin();
         while (cust_itr != custodians.end()) {
             const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
@@ -58,7 +58,7 @@ void auditor::allocateCustodians(bool early_election) {
     }
 }
 
-void auditor::setCustodianAuths() {
+void auditor::setAuditorAuths() {
 
     custodians_table custodians(_self, _self.value);
 
@@ -129,10 +129,10 @@ void auditor::newtenure(string message) {
                  "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
 
     // Set custodians for the next period.
-    allocateCustodians(false);
+    allocateAuditors(false);
 
     // Set the auths on the BOS auditor authority account
-    setCustodianAuths();
+    setAuditorAuths();
 
     _currentState.lastperiodtime = now();
 
