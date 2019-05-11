@@ -49,7 +49,7 @@ void auditor::modifyVoteWeights(name voter, vector<name> newVotes) {
         stake++;
     }
 
-    //Add any liquid balance
+    // Add any liquid balance
     // accounts accountstable(name(TOKEN_CONTRACT), voter.value);
     // const auto ac = accountstable.find(asset_name);
     // if (ac != accountstable.end()) {
@@ -70,7 +70,6 @@ void auditor::modifyVoteWeights(name voter, vector<name> newVotes) {
         } else {
             votes_cast_by_members.modify(existingVote, voter, [&](vote &v) {
                 v.candidates = newVotes;
-                v.proxy = name();
                 v.weight = vote_weight;
             });
         }

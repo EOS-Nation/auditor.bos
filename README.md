@@ -23,7 +23,6 @@ If an elected auditor resigns via the `withdrawcand` during a period a new candi
 ### votes
 
 - voter (account_name) - The account name of the voter (INDEX)
-- proxy (account_name) - Name of another voter used to proxy votes through. This should not have a value in both the proxy and candidates at the same time.
 - candidates (account_name[]) - The candidates voted for, can supply up to the maximum number of votes (currently 5) - Can be configured via `updateconfig`
 
 ### pendingpay

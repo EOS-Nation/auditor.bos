@@ -165,26 +165,19 @@ typedef multi_index<"custodians"_n, custodian,
 
 /**
  * - voter (account_name) - The account name of the voter (INDEX)
- * - proxy (account_name) - Name of another voter used to proxy votes through. This should not have a value in both the proxy and candidates at the same time.
  * - candidates (account_name[]) - The candidates voted for, can supply up to the maximum number of votes (currently 5) - Can be configured via `updateconfig`
  */
 struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
     name voter;
-    name proxy;
     uint64_t weight;
     std::vector<name> candidates;
 
     uint64_t primary_key() const { return voter.value; }
 
-    uint64_t by_proxy() const { return proxy.value; }
-
-    EOSLIB_SERIALIZE(vote, (voter)(proxy)(weight)(candidates))
+    EOSLIB_SERIALIZE(vote, (voter)(weight)(candidates))
 };
 
-typedef eosio::multi_index<"votes"_n, vote,
-        indexed_by<"byproxy"_n, const_mem_fun<vote, uint64_t, &vote::by_proxy> >
-> votes_table;
-
+typedef eosio::multi_index<"votes"_n, vote> votes_table;
 
 struct [[eosio::table("pendingstake"), eosio::contract("auditor")]] tempstake {
     name sender;
@@ -259,7 +252,7 @@ public:
      * @param from The account to observe as the source of funds for a transfer
      * @param to The account to observe as the destination of funds for a transfer
      * @param quantity
-     * @param memo A string to attach to a transaction. For staking this string should match the name of the running contract eg "dacelections". Otherwise it will be regarded only as a generic transfer to the account.
+     * @param memo A string to attach to a transaction. For staking this string should match the name of the running contract eg "auditor.bos". Otherwise it will be regarded only as a generic transfer to the account.
      * This action is intended only to observe transfers that are run by the associated token contract for the purpose of tracking the moving weights of votes if either the `from` or `to` in the transfer have active votes. It is not included in the ABI to prevent it from being called from outside the chain.
      */
     void transfer(name from,
@@ -269,8 +262,8 @@ public:
 
 
     /**
-     * This action is used to nominate a candidate for custodian elections.
-     * It must be authorised by the candidate and the candidate must be an active member of the dac, having agreed to the latest constitution.
+     * This action is used to nominate a candidate for auditor elections.
+     * It must be authorised by the candidate and the candidate must be an active member of BOS, having agreed to the latest constitution.
      * The candidate must have transferred a quantity of tokens (determined by a config setting - `lockupasset`) to the contract for staking before this action is executed. This could have been from a recent transfer with the contract name in the memo or from a previous time when this account had nominated, as long as the candidate had never `unstake`d those tokens.
      *
      * ### Assertions:
@@ -332,22 +325,30 @@ public:
      *
      *
      * ### Post Condition:
-     * The custodian will be removed from the active custodians and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement custodian will selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling dac auth account will be set for the custodian board.
+     * The auditor will be removed from the active auditors and should still be present in the candidates
+     * table but will be set to inactive. Their staked tokens will be locked up for the time delay added from
+     * the moment this action was called so they will not able to unstake until that time has passed.
+     *
+     * A replacement auditor will selected from the candidates to fill the missing place (based on vote ranking)
+     * then the auths for the controlling BOS auth account will be set for the auditor board.
      */
     ACTION resigncust(name cust);
 
     /**
-     * This action is used to remove a custodian.
+     * This action is used to remove a auditor.
      *
      * ### Assertions:
-     * - The action is authorised by the mid level of the auth account (currently elected custodian board).
-     * - The `cust` account is currently an elected custodian.
+     * - The action is authorised by the mid level of the auth account (currently elected auditor board).
+     * - The `cust` account is currently an elected auditor.
      *
      * @param cust - The account id for the candidate nominating.
      *
      *
      * ### Post Condition:
-     * The custodian will be removed from the active custodians and should still be present in the candidates table but will be set to inactive. Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until that time has passed. A replacement custodian will selected from the candidates to fill the missing place (based on vote ranking) then the auths for the controlling dac auth account will be set for the custodian board.
+     * The auditor will be removed from the active auditors and should still be present in the candidates table but will be set to inactive.
+     * Their staked tokens will be locked up for the time delay added from the moment this action was called so they will not able to unstake until
+     * that time has passed. A replacement auditor will selected from the candidates to fill the missing place (based on vote ranking)
+     * then the auths for the controlling BOS auth account will be set for the auditor board.
      */
     ACTION firecust(name cust);
 
@@ -368,11 +369,14 @@ public:
     ACTION updatebio(name cand, std::string bio);
 
     /**
-     * This action is to facilitate voting for candidates to become custodians of the DAC. Each member will be able to vote a configurable number of custodians set by the contract configuration. When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified. If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
+     * This action is to facilitate voting for candidates to become auditors of BOS.
+     * Each member will be able to vote a configurable number of auditors set by the contract configuration.
+     * When a voter calls this action either a new vote will be recorded or the existing vote for that voter will be modified.
+     * If an empty array of candidates is passed to the action an existing vote for that voter will be removed.
      *
      * ### Assertions:
      * - The voter account performing the action is authorised to do so.
-     * - The voter account performing has agreed to the latest member terms for the DAC.
+     * - The voter account performing has agreed to the latest member terms for BOS.
      * - The number of candidates in the newvotes vector is not greater than the number of allowed votes per voter as set by the contract config.
      * - Ensure there are no duplicate candidates in the voting vector.
      * - Ensure all the candidates in the vector are registered and active candidates.
