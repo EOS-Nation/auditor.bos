@@ -6,7 +6,7 @@
     "lockupasset": "100000.0000 BOS",
     "maxvotes": 3,
     "numelected": 5,
-    "periodlength": 604800,
+    "auditor_tenure_length": 604800,
     "auditor_pay": "0.0000 BOS",
     "tokenholder": "auditpay.bos",
     "vote_quorum_percent": 3
