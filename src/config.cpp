@@ -1,5 +1,5 @@
 
-void auditor::updateconfig(contr_config new_config) {
+void auditorbos::updateconfig(contr_config new_config) {
 
     if (configs().authaccount == name{0}) {
         require_auth(_self);

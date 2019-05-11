@@ -1,6 +1,6 @@
 
 
-void auditor::nominatecand(name cand) {
+void auditorbos::nominatecand(name cand) {
     require_auth(cand);
 
     _currentState.number_active_candidates++;
@@ -35,17 +35,17 @@ void auditor::nominatecand(name cand) {
     }
 }
 
-void auditor::withdrawcand(name cand) {
+void auditorbos::withdrawcand(name cand) {
     require_auth(cand);
     removeCandidate(cand, false);
 }
 
-void auditor::firecand(name cand, bool lockupStake) {
+void auditorbos::firecand(name cand, bool lockupStake) {
     require_auth(configs().authaccount);
     removeCandidate(cand, lockupStake);
 }
 
-void auditor::unstake(name cand) {
+void auditorbos::unstake(name cand) {
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::UNSTAKE_CAND_NOT_REGISTERED::Candidate is not already registered.");
     eosio_assert(!reg_candidate.is_active, "ERR::UNSTAKE_CANNOT_UNSTAKE_FROM_ACTIVE_CAND::Cannot unstake tokens for an active candidate. Call withdrawcand first.");
 
@@ -72,23 +72,23 @@ void auditor::unstake(name cand) {
     });
 }
 
-void auditor::resigncust(name cust) {
+void auditorbos::resigncust(name cust) {
     require_auth(cust);
     removeAuditor(cust);
 }
 
-void auditor::firecust(name cust) {
+void auditorbos::firecust(name cust) {
     require_auth(configs().authaccount);
     removeAuditor(cust);
 }
 
 // private methods for the above actions
 
-void auditor::removeAuditor(name cust) {
+void auditorbos::removeAuditor(name cust) {
 
     custodians_table custodians(_self, _self.value);
     auto elected = custodians.find(cust.value);
-    eosio_assert(elected != custodians.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current custodian.");
+    eosio_assert(elected != custodians.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITORbos::The entered account name is not for a current custodian.");
 
     eosio::print("Remove auditor from the auditors table.");
     custodians.erase(elected);
@@ -103,7 +103,7 @@ void auditor::removeAuditor(name cust) {
     setAuditorAuths();
 }
 
-void auditor::removeCandidate(name cand, bool lockupStake) {
+void auditorbos::removeCandidate(name cand, bool lockupStake) {
     _currentState.number_active_candidates--;
 
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::REMOVECANDIDATE_NOT_CURRENT_CANDIDATE::Candidate is not already registered.");

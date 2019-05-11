@@ -1,11 +1,11 @@
-void auditor::assertPeriodTime() {
+void auditorbos::assertPeriodTime() {
     uint32_t timestamp = now();
     uint32_t periodBlockCount = timestamp - _currentState.lastperiodtime;
     eosio_assert(periodBlockCount > configs().auditor_tenure,
                  "ERR::NEWTENURE_EARLY::New period is being called too soon. Wait until the period has completed.");
 }
 
-void auditor::allocateAuditors(bool early_election) {
+void auditorbos::allocateAuditors(bool early_election) {
 
     eosio::print("Configure auditors for the next period.");
 
@@ -58,7 +58,7 @@ void auditor::allocateAuditors(bool early_election) {
     }
 }
 
-void auditor::setAuditorAuths() {
+void auditorbos::setAuditorAuths() {
 
     custodians_table custodians(_self, _self.value);
 
@@ -90,7 +90,7 @@ void auditor::setAuditorAuths() {
             .send();
 }
 
-void auditor::newtenure(string message) {
+void auditorbos::newtenure(string message) {
 
     print("Start");
 

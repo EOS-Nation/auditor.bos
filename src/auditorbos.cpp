@@ -6,7 +6,7 @@
 #include <eosiolib/multi_index.hpp>
 #include <eosiolib/public_key.hpp>
 #include <string>
-#include "auditor/auditor.hpp"
+#include "auditorbos/auditorbos.hpp"
 
 #include "update_member_details.cpp"
 #include "registering.cpp"
@@ -39,7 +39,7 @@ extern "C" { \
    } \
 }
 
-EOSIO_ABI_EX(auditor,
+EOSIO_ABI_EX(auditorbos,
              (updateconfig)
              (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
              (updatebio)

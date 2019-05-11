@@ -36,7 +36,7 @@ using namespace std;
  * - auth_threshold_auditors (uint8) - Number of auditors required to approve the lowest level actions.
  * - lockup_release_time_delay (date) - The time before locked up stake can be released back to the candidate using the unstake action
  */
-struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
+struct [[eosio::table("config"), eosio::contract("auditorbos")]] contr_config {
     // The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
 
@@ -80,7 +80,7 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
 
 typedef singleton<"config"_n, contr_config> configscontainer;
 
-struct [[eosio::table("state"), eosio::contract("auditor")]] contr_state {
+struct [[eosio::table("state"), eosio::contract("auditorbos")]] contr_state {
     uint32_t lastperiodtime = 0;
     int64_t total_weight_of_votes = 0;
     int64_t total_votes_on_candidates = 0;
@@ -108,7 +108,7 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
  * - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
  * - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newtenure` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
  */
-struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
+struct [[eosio::table("candidates"), eosio::contract("auditorbos")]] candidate {
     name candidate_name;
     asset locked_tokens;
     uint64_t total_votes;
@@ -135,7 +135,7 @@ typedef multi_index<"candidates"_n, candidate,
  * - cust_name (name) - Account name of the auditor (INDEX)
  * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.
  */
-struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
+struct [[eosio::table("custodians"), eosio::contract("auditorbos")]] custodian {
     name cust_name;
     uint64_t total_votes;
 
@@ -148,7 +148,7 @@ struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
 };
 
 
-struct [[eosio::table("bios"), eosio::contract("auditor")]] bios {
+struct [[eosio::table("bios"), eosio::contract("auditorbos")]] bios {
     name candidate_name;
     string bio;
 
@@ -167,7 +167,7 @@ typedef multi_index<"custodians"_n, custodian,
  * - voter (account_name) - The account name of the voter (INDEX)
  * - candidates (account_name[]) - The candidates voted for, can supply up to the maximum number of votes (currently 5) - Can be configured via `updateconfig`
  */
-struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
+struct [[eosio::table("votes"), eosio::contract("auditorbos")]] vote {
     name voter;
     uint64_t weight;
     std::vector<name> candidates;
@@ -179,7 +179,7 @@ struct [[eosio::table("votes"), eosio::contract("auditor")]] vote {
 
 typedef eosio::multi_index<"votes"_n, vote> votes_table;
 
-struct [[eosio::table("pendingstake"), eosio::contract("auditor")]] tempstake {
+struct [[eosio::table("pendingstake"), eosio::contract("auditorbos")]] tempstake {
     name sender;
     asset quantity;
     string memo;
@@ -192,7 +192,7 @@ struct [[eosio::table("pendingstake"), eosio::contract("auditor")]] tempstake {
 typedef multi_index<"pendingstake"_n, tempstake> pendingstake_table_t;
 
 
-class auditor : public contract {
+class auditorbos : public contract {
 
 private: // Variables used throughout the other actions.
     configscontainer config_singleton;
@@ -204,7 +204,7 @@ private: // Variables used throughout the other actions.
 
 public:
 
-    auditor( name s, name code, datastream<const char*> ds )
+    auditorbos( name s, name code, datastream<const char*> ds )
         :contract(s,code,ds),
             registered_candidates(_self, _self.value),
             votes_cast_by_members(_self, _self.value),
@@ -215,7 +215,7 @@ public:
         _currentState = contract_state.get_or_default(contr_state());
     }
 
-    ~auditor() {
+    ~auditorbos() {
         contract_state.set(_currentState, _self); // This should not run during a contract_state migration since it will prevent changing the schema with data saved between runs.
     }
 
