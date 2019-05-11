@@ -29,8 +29,8 @@ using namespace std;
  * - lockupasset (asset) -  The amount of assets that are locked up by each candidate applying for election.
  * - maxvotes (int default=5) - The maximum number of votes that each member can make for a candidate.
  * - numelected (int) -  Number of auditors to be elected for each election count.
- * - periodlength (uint32 =  7 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newperiod` calls.
- * - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newperiod.
+ * - periodlength (uint32 =  7 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newtenure` calls.
+ * - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newtenure.
  * - tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
  * - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
  * - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
@@ -51,10 +51,10 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     uint8_t numelected = 5;
 
     // Length of a period in seconds.
-    // - used for pay calculations if an eary election is called and to trigger deferred `newperiod` calls.
+    // - used for pay calculations if an eary election is called and to trigger deferred `newtenure` calls.
     uint32_t periodlength = 7 * 24 * 60 * 60;
 
-    // account to have active auth set with all all custodians on the newperiod.
+    // account to have active auth set with all all custodians on the newtenure.
     name authaccount = name{0};
 
     // The contract that holds the fund for the BOS auditor pay. This is used as the source for auditor pay.
@@ -115,7 +115,7 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
  * - candidate_name (name) - Account name of the candidate (INDEX)
  * - is_active (int8) - Boolean indicating if the candidate is currently available for election. (INDEX)
  * - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
- * - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newperiod` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
+ * - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newtenure` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
  */
 struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     name candidate_name;
@@ -143,7 +143,7 @@ typedef multi_index<"candidates"_n, candidate,
 
 /**
  * - cust_name (name) - Account name of the auditor (INDEX)
- * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newperiod` action.
+ * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.
  */
 struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
     name cust_name;
@@ -279,7 +279,7 @@ public:
      * - lockupasset(uint8_t) : defines the asset and amount required for a user to register as a candidate. This is the amount that will be locked up until the user calls `withdrawcand` in order to get the asset returned to them. If there are currently already registered candidates in the contract this cannot be changed to a different asset type because of introduced complexity of handling the staked amounts.
      * - maxvotes(asset) : Defines the maximum number of candidates a user can vote for at any given time.
      * - numelected(uint16_t) : The number of candidates to elect for auditors. This is used for the payment amount to auditors for median amount.
-     * - periodlength(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newperiod` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newperiod` action.
+     * - periodlength(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newtenure` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newtenure` action.
      * - tokcontr(name) : The token contract used to manage the tokens for BOS.
      * - authaccount(name) : The managing account that controls the BOS auditor permission.
      * - tokenholder(name) : The account that controls the funds for BOS.
@@ -429,7 +429,7 @@ public:
     ACTION refreshvote(name voter);
 
     /**
-     * ### newperiod
+     * ### newtenure
      *
      * This action is to be run to end and begin each period in BOS life cycle. It performs multiple tasks for BOS including:
      *
@@ -444,7 +444,7 @@ public:
      *
      * message - a string that is used to log a message in the chain history logs. It serves no function in the contract logic.
      */
-    ACTION newperiod(std::string message);
+    ACTION newtenure(std::string message);
 
     /**
      * This action is to claim pay as a custodian.

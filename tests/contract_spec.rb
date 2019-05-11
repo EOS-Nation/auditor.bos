@@ -671,7 +671,7 @@ describe "eosdacelect" do
     end
   end
 
-  describe "newperiod" do
+  describe "newtenure" do
     before(:all) do
       seed_account("voter3", issue: "110.0000 EOS", memberreg: "New Latest terms")
       seed_account("whale1", issue: "1500000.0000 EOS", memberreg: "New Latest terms")
@@ -681,7 +681,7 @@ describe "eosdacelect" do
       before(:all) do
         `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "periodlength": 5, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
       end
-      command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
+      command %(cleos push action daccustodian newtenure '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
       its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
     end
 
@@ -692,7 +692,7 @@ describe "eosdacelect" do
       end
 
       context "given there are not enough candidates to fill the custodians" do
-        command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
+        command %(cleos push action daccustodian newtenure '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
         its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
       end
 
@@ -715,7 +715,7 @@ describe "eosdacelect" do
           seed_account("allocate52", issue: "101.0000 EOS", memberreg: "New Latest terms", stake: "23.0000 EOS", requestedpay: "25.0000 EOS")
         end
 
-        command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
+        command %(cleos push action daccustodian newtenure '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
         its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
       end
 
@@ -726,15 +726,15 @@ describe "eosdacelect" do
           `cleos push action daccustodian votecust '{ "voter": "voter3", "newvotes": ["allocate12","allocate22","allocate32","allocate4","allocate5"]}' -p voter3`
         end
         context "But not enough engagement to active the DAC" do
-          command %(cleos push action daccustodian newperiod '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
+          command %(cleos push action daccustodian newtenure '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
           its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
         end
 
         context "And enough voter weight to activate the DAC" do
           before(:all) {`cleos push action daccustodian votecust '{ "voter": "whale1", "newvotes": ["allocate12","allocate22","allocate32","allocate4","allocate5"]}' -p whale1`}
 
-          command %(cleos push action daccustodian newperiod '{ "message": "log message"}' -p daccustodian), allow_error: true
-            its(:stdout) {is_expected.to include('daccustodian::newperiod')}
+          command %(cleos push action daccustodian newtenure '{ "message": "log message"}' -p daccustodian), allow_error: true
+            its(:stdout) {is_expected.to include('daccustodian::newtenure')}
         end
       end
 
@@ -783,12 +783,12 @@ describe "eosdacelect" do
     end
 
     # TODO: Figure out why this succeeded
-    describe "called too early in the period should fail after recent newperiod call" do
+    describe "called too early in the period should fail after recent newtenure call" do
       before(:all) do
         `cleos push action daccustodian votecust '{ "voter": "whale1", "newvotes": ["allocate1","allocate2","allocate3","allocate4","allocate5"]}' -p whale1`
       end
 
-      command %(cleos push action daccustodian newperiod '{ "message": "called too early", "earlyelect": false}' -p daccustodian), allow_error: true
+      command %(cleos push action daccustodian newtenure '{ "message": "called too early", "earlyelect": false}' -p daccustodian), allow_error: true
       its(:stderr) {is_expected.to include('New period is being called too soon. Wait until the period has complete')}
     end
 
@@ -797,8 +797,8 @@ describe "eosdacelect" do
         `cleos push action daccustodian updateconfig '{"newconfig": {  "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "periodlength": 1, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
         sleep 2
       end
-      command %(cleos push action daccustodian newperiod '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
-      its(:stdout) {is_expected.to include('daccustodian::newperiod')}
+      command %(cleos push action daccustodian newtenure '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
+      its(:stdout) {is_expected.to include('daccustodian::newtenure')}
     end
 
     describe "called after voter engagement has dropped to too low" do
@@ -808,7 +808,7 @@ describe "eosdacelect" do
         `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "periodlength": 1, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 4, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
         sleep 2
       end
-      command %(cleos push action daccustodian newperiod '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
+      command %(cleos push action daccustodian newtenure '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
       its(:stderr) {is_expected.to include('Voter engagement is insufficient to process a new period')}
     end
 
@@ -819,8 +819,8 @@ describe "eosdacelect" do
 
         sleep 2
       end
-      command %(cleos push action daccustodian newperiod '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
-      its(:stdout) {is_expected.to include('daccustodian::newperiod')}
+      command %(cleos push action daccustodian newtenure '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
+      its(:stdout) {is_expected.to include('daccustodian::newtenure')}
     end
 
     context "the pending_pay table" do

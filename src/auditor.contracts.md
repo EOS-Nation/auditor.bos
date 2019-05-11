@@ -168,7 +168,7 @@ I
 * __voter__ is an eosio account_name parameter for the voting member.
 * __newvotes__ is an array of nominated candidates account names that the voter intends to vote for with a maximum number of votes as configured by the contract.
 
-**INTENT:** The intent of votecust is to allow a member of the DAC to vote for candidates that are eligible become auditors after the next call to {{ newperiod }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election. This action will replace an existing vote for a proxy for {{ voter }} if one exists.
+**INTENT:** The intent of votecust is to allow a member of the DAC to vote for candidates that are eligible become auditors after the next call to {{ newtenure }}. The action ensures the user has agreed to the latest terms and conditions and has the correct authorization of the account: {{ voter }} to place or change an active vote. Upon success this action will either update an existing vote with a new set of candidates or create a new active vote for the {{ voter }} for candidates eligible for election. This action will replace an existing vote for a proxy for {{ voter }} if one exists.
 
 **TERM:** The action changes the preferred auditors for an account until superseded by another action.
 
@@ -186,14 +186,14 @@ I
 **TERM:** The action changes the proxy until superseded by another action.
 
 <h1 class="contract">
-  newperiod
+  newtenure
 </h1>
 
-## ACTION: newperiod
+## ACTION: newtenure
 **PARAMETERS:**
 * __message__ is string used only for logging in the blockchain history and serves no purpose in the action contract logic.
 
-**INTENT:** The intent of {{ newperiod }} is to signal the end of one election period and commence the next. It performs several actions after the following conditions are met:
+**INTENT:** The intent of {{ newtenure }} is to signal the end of one election period and commence the next. It performs several actions after the following conditions are met:
  * The action is not called before the period should have ended
  * Enough voter value has participated to trigger the initial running of the BOS
  * After BOS auditors has started enough voter value has continued engagement with the BOS auditor voting process.
@@ -202,7 +202,7 @@ I
 3. Set the permissions for the elected auditors so they have sufficient permission to run the BOS auditor permission according to the constitution and technical permissions design.
 4. Set the time for the beginning of the next period to mark the reset anniversary for the BOS auditor elections.
 
-**TERM:** The action changes the relevant contract data until a subsequent newperiod is called.
+**TERM:** The action changes the relevant contract data until a subsequent newtenure is called.
 
 <h1 class="contract">
   claimpay

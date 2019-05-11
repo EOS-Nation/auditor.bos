@@ -15,7 +15,7 @@
 #include "migration.cpp"
 #endif
 #include "privatehelpers.cpp"
-#include "newperiod_components.cpp"
+#include "newtenure_components.cpp"
 #include "pay_handling.cpp"
 #include "external_observable_actions.cpp"
 #include "config.cpp"
@@ -45,7 +45,7 @@ EOSIO_ABI_EX(auditor,
              (nominatecand)(withdrawcand)(firecand)(resigncust)(firecust)(unstake)
              (updatebio)
              (votecust)(refreshvote)
-             (newperiod)
+             (newtenure)
              (claimpay)
              (transfer)
 #ifdef MIGRATE
