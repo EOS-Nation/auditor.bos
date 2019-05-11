@@ -49,7 +49,7 @@ void auditor::unstake(name cand) {
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::UNSTAKE_CAND_NOT_REGISTERED::Candidate is not already registered.");
     eosio_assert(!reg_candidate.is_active, "ERR::UNSTAKE_CANNOT_UNSTAKE_FROM_ACTIVE_CAND::Cannot unstake tokens for an active candidate. Call withdrawcand first.");
 
-    eosio_assert(reg_candidate.custodian_end_time_stamp < time_point_sec(now()), "ERR::UNSTAKE_CANNOT_UNSTAKE_UNDER_TIME_LOCK::Cannot unstake tokens before they are unlocked from the time delay.");
+    eosio_assert(reg_candidate.auditor_end_time_stamp < time_point_sec(now()), "ERR::UNSTAKE_CANNOT_UNSTAKE_UNDER_TIME_LOCK::Cannot unstake tokens before they are unlocked from the time delay.");
 
     registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
         // Ensure the candidate's tokens are not locked up for a time delay period.
@@ -114,7 +114,7 @@ void auditor::removeCandidate(name cand, bool lockupStake) {
         c.is_active = 0;
         if (lockupStake) {
             eosio::print("Lockup stake for release delay.");
-            c.custodian_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
+            c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
         }
     });
 }

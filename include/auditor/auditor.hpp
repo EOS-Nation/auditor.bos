@@ -113,7 +113,7 @@ struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     asset locked_tokens;
     uint64_t total_votes;
     uint8_t is_active;
-    time_point_sec custodian_end_time_stamp;
+    time_point_sec auditor_end_time_stamp;
 
     uint64_t primary_key() const { return candidate_name.value; }
 
@@ -122,7 +122,7 @@ struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     uint64_t by_votes_rank() const { return static_cast<uint64_t>(UINT64_MAX - total_votes); }
 
     EOSLIB_SERIALIZE(candidate,
-                     (candidate_name)(locked_tokens)(total_votes)(is_active)(custodian_end_time_stamp))
+                     (candidate_name)(locked_tokens)(total_votes)(is_active)(auditor_end_time_stamp))
 };
 
 typedef multi_index<"candidates"_n, candidate,

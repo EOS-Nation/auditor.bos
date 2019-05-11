@@ -38,7 +38,7 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "custodian_end_time_stamp",
+                    "name": "auditor_end_time_stamp",
                     "type": "time_point_sec"
                 }
             ]

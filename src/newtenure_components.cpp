@@ -23,7 +23,7 @@ void auditor::allocateCustodians(bool early_election) {
             const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
             registered_candidates.modify(reg_candidate, cust_itr->cust_name, [&](candidate &c) {
                 eosio::print("Lockup stake for release delay.");
-                c.custodian_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
+                c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
             });
             cust_itr = custodians.erase(cust_itr);
         }
@@ -49,7 +49,7 @@ void auditor::allocateCustodians(bool early_election) {
 
             byvotes.modify(cand_itr, cand_itr->candidate_name, [&](candidate &c) {
                     eosio::print("Lockup stake for release delay.");
-                    c.custodian_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
+                    c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
             });
 
             currentCustodianCount++;
