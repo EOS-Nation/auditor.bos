@@ -31,7 +31,6 @@ using namespace std;
  * - numelected (int) -  Number of auditors to be elected for each election count.
  * - auditor_tenure (uint32 =  90 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newtenure` calls.
  * - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newtenure.
- * - tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
  * - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
  * - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
  * - auth_threshold_auditors (uint8) - Number of auditors required to approve the lowest level actions.
@@ -40,9 +39,6 @@ using namespace std;
 struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
     // The amount of assets that are locked up by each candidate applying for election.
     asset lockupasset;
-
-    // NEW: The pay allocated for each auditor per period
-    asset auditor_pay;
 
     // The maximum number of votes that each member can make for a candidate.
     uint8_t maxvotes = 3;
@@ -56,9 +52,6 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
 
     // account to have active auth set with all all custodians on the newtenure.
     name authaccount = name{0};
-
-    // The contract that holds the fund for the BOS auditor pay. This is used as the source for auditor pay.
-    name tokenholder = "auditpay.bos"_n;
 
     // Amount of token value in votes required to trigger the initial set of custodians
     uint32_t initial_vote_quorum_percent;
@@ -74,12 +67,10 @@ struct [[eosio::table("config"), eosio::contract("auditor")]] contr_config {
 
     EOSLIB_SERIALIZE(contr_config,
                     (lockupasset)
-                    (auditor_pay)
                     (maxvotes)
                     (numelected)
                     (auditor_tenure)
                     (authaccount)
-                    (tokenholder)
                     (initial_vote_quorum_percent)
                     (vote_quorum_percent)
                     (auth_threshold_auditors)
@@ -119,7 +110,6 @@ uint128_t combine_ids(const uint8_t &boolvalue, const uint64_t &longValue) {
  */
 struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     name candidate_name;
-    asset auditor_pay;
     asset locked_tokens;
     uint64_t total_votes;
     uint8_t is_active;
@@ -132,7 +122,7 @@ struct [[eosio::table("candidates"), eosio::contract("auditor")]] candidate {
     uint64_t by_votes_rank() const { return static_cast<uint64_t>(UINT64_MAX - total_votes); }
 
     EOSLIB_SERIALIZE(candidate,
-                     (candidate_name)(auditor_pay)(locked_tokens)(total_votes)(is_active)(custodian_end_time_stamp))
+                     (candidate_name)(locked_tokens)(total_votes)(is_active)(custodian_end_time_stamp))
 };
 
 typedef multi_index<"candidates"_n, candidate,
@@ -147,7 +137,6 @@ typedef multi_index<"candidates"_n, candidate,
  */
 struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
     name cust_name;
-    asset auditor_pay;
     uint64_t total_votes;
 
     uint64_t primary_key() const { return cust_name.value; }
@@ -155,7 +144,7 @@ struct [[eosio::table("custodians"), eosio::contract("auditor")]] custodian {
     uint64_t by_votes_rank() const { return static_cast<uint64_t>(UINT64_MAX - total_votes); }
 
     EOSLIB_SERIALIZE(custodian,
-                     (cust_name)(auditor_pay)(total_votes))
+                     (cust_name)(total_votes))
 };
 
 
@@ -196,27 +185,6 @@ typedef eosio::multi_index<"votes"_n, vote,
         indexed_by<"byproxy"_n, const_mem_fun<vote, uint64_t, &vote::by_proxy> >
 > votes_table;
 
-/**
- * - key (uint64) -  auto incrementing id to identify a payment due to an auditor
- * - receiver (account_name) - The account name of the intended receiver.
- * - quantity (asset) - The amount for the payment.
- * - memo (string) - A string used in the memo to help the receiver identify it in logs.
- */
-struct [[eosio::table("pendingpay"), eosio::contract("auditor")]] pay {
-    uint64_t key;
-    name receiver;
-    asset quantity;
-    string memo;
-
-    uint64_t primary_key() const { return key; }
-    uint64_t byreceiver() const { return receiver.value; }
-
-    EOSLIB_SERIALIZE(pay, (key)(receiver)(quantity)(memo))
-};
-
-typedef multi_index<"pendingpay"_n, pay,
-        indexed_by<"byreceiver"_n, const_mem_fun<pay, uint64_t, &pay::byreceiver> >
-> pending_pay_table;
 
 struct [[eosio::table("pendingstake"), eosio::contract("auditor")]] tempstake {
     name sender;
@@ -238,7 +206,6 @@ private: // Variables used throughout the other actions.
     statecontainer contract_state;
     candidates_table registered_candidates;
     votes_table votes_cast_by_members;
-    pending_pay_table pending_pay;
     bios_table candidate_bios;
     contr_state _currentState;
 
@@ -248,7 +215,6 @@ public:
         :contract(s,code,ds),
             registered_candidates(_self, _self.value),
             votes_cast_by_members(_self, _self.value),
-            pending_pay(_self, _self.value),
             candidate_bios(_self, _self.value),
             config_singleton(_self, _self.value),
             contract_state(_self, _self.value) {
@@ -280,9 +246,7 @@ public:
      * - maxvotes(asset) : Defines the maximum number of candidates a user can vote for at any given time.
      * - numelected(uint16_t) : The number of candidates to elect for auditors. This is used for the payment amount to auditors for median amount.
      * - auditor_tenure(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newtenure` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newtenure` action.
-     * - tokcontr(name) : The token contract used to manage the tokens for BOS.
      * - authaccount(name) : The managing account that controls the BOS auditor permission.
-     * - tokenholder(name) : The account that controls the funds for BOS.
      * - initial_vote_quorum_percent (uint32) : The percent of voters required to activate BOS for the first election period.
      * - vote_quorum_percent (uint32) : The percent of voters required to continue BOS for the following election periods after the first one has activated BOS.
      * - auth_threshold_auditors (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).
@@ -447,21 +411,6 @@ public:
     ACTION newtenure(std::string message);
 
     /**
-     * This action is to claim pay as a custodian.
-     *
-     * ### Assertions:
-     * - The caller to the action account performing the action is authorised to do so.
-     * - The payid is for a valid pay record in the pending pay table.
-     * - The callas account is the same as the intended destination account for the pay record.
-     *
-     * @param payid - The id for the pay record to claim from the pending pay table.
-     *
-     * ### Post Condition:
-     * The quantity owed to the custodian as referred to by the pay record is transferred to the claimer and then the pay record is removed from the pending pay table.
-     */
-    ACTION claimpay(uint64_t payid);
-
-    /**
      * This action is used to unstake a candidates tokens and have them transferred to their account.
      *
      * ### Assertions:
@@ -489,8 +438,6 @@ private: // Private helper methods used by other actions.
     void modifyVoteWeights(name voter, vector<name> newVotes);
 
     void assertPeriodTime();
-
-    void distributePay();
 
     void setCustodianAuths();
 

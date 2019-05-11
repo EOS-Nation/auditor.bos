@@ -1,22 +1,3 @@
-
-void auditor::distributePay() {
-    custodians_table custodians(_self, _self.value);
-    auto auditor_pay = configs().auditor_pay;
-
-    if (auditor_pay.amount > 0) {
-        for (auto cust: custodians) {
-            pending_pay.emplace(_self, [&](pay &p) {
-                p.key = pending_pay.available_primary_key();
-                p.receiver = cust.cust_name;
-                p.quantity = auditor_pay;
-                p.memo = "Auditor pay. Thank you.";
-            });
-        }
-    }
-
-    print("distribute pay");
-}
-
 void auditor::assertPeriodTime() {
     uint32_t timestamp = now();
     uint32_t periodBlockCount = timestamp - _currentState.lastperiodtime;
@@ -63,7 +44,6 @@ void auditor::allocateCustodians(bool early_election) {
         } else {
             custodians.emplace(_self, [&](custodian &c) {
                 c.cust_name = cand_itr->candidate_name;
-                c.auditor_pay = cand_itr->auditor_pay;
                 c.total_votes = cand_itr->total_votes;
             });
 
@@ -147,9 +127,6 @@ void auditor::newtenure(string message) {
 
     eosio_assert(percent_of_current_voter_engagement > config.vote_quorum_percent,
                  "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
-
-    // Distribute pay to the current custodians.
-    distributePay();
 
     // Set custodians for the next period.
     allocateCustodians(false);

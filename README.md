@@ -40,7 +40,6 @@ If an elected auditor resigns via the `withdrawcand` during a period a new candi
 - numelected (int default=5) -  Number of auditors to be elected for each election count.
 - auditor_tenure (uint32 =  90 * 24 * 60 * 60) - Length of a period in seconds. Used for pay calculations if an early election is called and to trigger deferred `newtenure` calls.
 - authaccount ( account= "auditor.bos") - account to have active auth set with all auditors on the newtenure.
-- tokenholder ( account = "auditpay.bos") - The contract that holds the fund for BOS. This is used as the source for auditor pay.
 - initial_vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the initial set of auditors
 - vote_quorum_percent (uint32) - Amount of token value in votes required to trigger the allow a new set of auditors to be set after the initial threshold has been achieved.
 - auth_threshold_auditors (uint8) - Number of auditors required to approve the lowest level actions.
@@ -178,9 +177,7 @@ The parameters are:
 - maxvotes(asset) : Defines the maximum number of candidates a user can vote for at any given time.
 - numelected(uint16_t) : The number of candidates to elect for auditors. This is used for the payment amount to auditors for median amount.
 - auditor_tenure(uint32_t) : The length of a period in seconds. This is used for the scheduling of the deferred `newtenure` actions at the end of processing the current one. Also is used as part of the partial payment to auditors in the case of an elected auditor resigning which would also trigger a `newtenure` action.
-- tokcontr(name) : The token contract used to manage the tokens for BOS.
 - authaccount(name) : The managing account that controls the BOS auditor permission.
-- tokenholder(name) : The account that controls the funds for BOS.
 - initial_vote_quorum_percent (uint32) : The percent of voters required to activate BOS for the first election period.
 - vote_quorum_percent (uint32) : The percent of voters required to continue BOS for the following election periods after the first one has activated BOS.
 - auth_threshold_auditors (uint8) : The number of auditors required to approve an action in the low permission category ( ordinary action such as a worker proposal).

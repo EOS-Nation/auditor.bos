@@ -32,7 +32,6 @@ ACCOUNT_NAME = 'daccustodian'
 
 TOKENCONTRACT = 'eosio.token'
 AUTHACCOUNT = 'auditor.bos'
-TOKENHOLDER = 'auditpay.bos'
 
 CONTRACTS_DIR = 'dependencies'
 
@@ -192,18 +191,18 @@ describe "eosdacelect" do
   describe "updateconfig" do
     context "before being called with token contract will prevent other actions from working" do
       context "with valid and registered member" do
-        command %(cleos push action daccustodian nominatecand '{ "cand": "testreguser1", "bio": "any bio", "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3}' -p testreguser1), allow_error: true
+        command %(cleos push action daccustodian nominatecand '{ "cand": "testreguser1", "bio": "any bio", "authaccount": "dacauthority", "auththresh": 3}' -p testreguser1), allow_error: true
         its(:stderr) {is_expected.to include('Error 3050003')}
       end
     end
 
     context "with invalid auth" do
-      command %(cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "13.0000 EOS", "maxvotes": 4, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p testreguser1), allow_error: true
+      command %(cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "13.0000 EOS", "maxvotes": 4, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p testreguser1), allow_error: true
       its(:stderr) {is_expected.to include('Error 3090004')}
     end
 
     context "with valid auth" do
-      command %(cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund",  "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p daccustodian), allow_error: true
+      command %(cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority",  "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p daccustodian), allow_error: true
       its(:stdout) {is_expected.to include('daccustodian::updateconfig')}
     end
   end
@@ -276,7 +275,7 @@ describe "eosdacelect" do
 
   context "To ensure behaviours change after updateconfig" do
     context "updateconfigs with valid auth" do
-      command %(cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "23.0000 EOS", "maxvotes": 5, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p dacauthority), allow_error: true
+      command %(cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "23.0000 EOS", "maxvotes": 5, "auditor_tenure": 604800 , "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 11, "auth_threshold_mid": 7, "auth_threshold_low": 3, "lockup_release_time_delay": 10 }}' -p dacauthority), allow_error: true
       its(:stdout) {is_expected.to include('daccustodian::updateconfig')}
     end
   end
@@ -679,7 +678,7 @@ describe "eosdacelect" do
 
     describe "with insufficient votes to trigger the dac should fail" do
       before(:all) do
-        `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 5, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
+        `cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 5, "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
       end
       command %(cleos push action daccustodian newtenure '{ "message": "log message", "earlyelect": false}' -p daccustodian), allow_error: true
       its(:stderr) {is_expected.to include('Voter engagement is insufficient to activate the Audit Cycle')}
@@ -688,7 +687,7 @@ describe "eosdacelect" do
     describe "allocateCust" do
       before(:all) do
         # add cands
-        `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1 , "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 4, "auth_threshold_mid": 4, "auth_threshold_low": 2, "lockup_release_time_delay": 10 }}' -p dacauthority`
+        `cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1 , "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 4, "auth_threshold_mid": 4, "auth_threshold_low": 2, "lockup_release_time_delay": 10 }}' -p dacauthority`
       end
 
       context "given there are not enough candidates to fill the custodians" do
@@ -794,7 +793,7 @@ describe "eosdacelect" do
 
     describe "called after period time has passed" do
       before(:all) do
-        `cleos push action daccustodian updateconfig '{"newconfig": {  "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
+        `cleos push action daccustodian updateconfig '{"newconfig": { "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 10, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
         sleep 2
       end
       command %(cleos push action daccustodian newtenure '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
@@ -805,7 +804,7 @@ describe "eosdacelect" do
       before(:all) do
         # Remove the whale vote to drop backs
         `cleos push action daccustodian votecust '{ "voter": "whale1", "newvotes": []}' -p whale1`
-        `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 4, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
+        `cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 4, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
         sleep 2
       end
       command %(cleos push action daccustodian newtenure '{ "message": "Good new period call after config change", "earlyelect": false}' -p daccustodian), allow_error: true
@@ -814,7 +813,7 @@ describe "eosdacelect" do
 
     describe "called after voter engagement has risen to above the continuing threshold" do
       before(:all) do
-        `cleos push action daccustodian updateconfig '{"newconfig": { "auditor_pay": "10.0000 EOS", "lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "tokenholder": "bosauditfund", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 4, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
+        `cleos push action daccustodian updateconfig '{"newconfig": {"lockupasset": "10.0000 EOS", "maxvotes": 5, "auditor_tenure": 1, "numelected": 12, "authaccount": "dacauthority", "auththresh": 3, "initial_vote_quorum_percent": 15, "vote_quorum_percent": 4, "auth_threshold_high": 3, "auth_threshold_mid": 2, "auth_threshold_low": 1, "lockup_release_time_delay": 10 }}' -p dacauthority`
         `cleos push action eosio.token transfer '{ "from": "whale1", "to": "voter1", "quantity": "1300.0000 EOS","memo":"random transfer"}' -p whale1`
 
         sleep 2
