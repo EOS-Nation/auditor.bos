@@ -4,6 +4,20 @@
     "types": [],
     "structs": [
         {
+            "name": "auditor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "cust_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_votes",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "bios",
             "base": "",
             "fields": [
@@ -108,20 +122,6 @@
                 {
                     "name": "met_initial_votes_threshold",
                     "type": "bool"
-                }
-            ]
-        },
-        {
-            "name": "custodian",
-            "base": "",
-            "fields": [
-                {
-                    "name": "cust_name",
-                    "type": "name"
-                },
-                {
-                    "name": "total_votes",
-                    "type": "uint64"
                 }
             ]
         },
@@ -343,6 +343,13 @@
     ],
     "tables": [
         {
+            "name": "auditors",
+            "type": "auditor",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "bios",
             "type": "bios",
             "index_type": "i64",
@@ -359,13 +366,6 @@
         {
             "name": "config",
             "type": "contr_config",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "custodians",
-            "type": "custodian",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

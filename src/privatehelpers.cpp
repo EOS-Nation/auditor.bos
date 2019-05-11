@@ -5,20 +5,20 @@ contr_config auditorbos::configs() {
     return conf;
 }
 
-void auditorbos::updateVoteWeight(name custodian, int64_t weight) {
+void auditorbos::updateVoteWeight(name auditor, int64_t weight) {
     if (weight == 0) {
         print("\n Vote has no weight - No need to continue.");
     }
 
-    auto candItr = registered_candidates.find(custodian.value);
+    auto candItr = registered_candidates.find(auditor.value);
     if (candItr == registered_candidates.end()) {
-        eosio::print("Candidate not found while updating from a transfer: ", custodian);
+        eosio::print("Candidate not found while updating from a transfer: ", auditor);
         return; // trying to avoid throwing errors from here since it's unrelated to a transfer action.?!?!?!?!
     }
 
-    registered_candidates.modify(candItr, custodian, [&](auto &c) {
+    registered_candidates.modify(candItr, auditor, [&](auto &c) {
         c.total_votes += weight;
-        eosio::print("\nchanging vote weight: ", custodian, " by ", weight);
+        eosio::print("\nchanging vote weight: ", auditor, " by ", weight);
     });
 }
 

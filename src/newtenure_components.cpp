@@ -9,40 +9,40 @@ void auditorbos::allocateAuditors(bool early_election) {
 
     eosio::print("Configure auditors for the next period.");
 
-    custodians_table custodians(_self, _self.value);
+    auditors_table auditors(_self, _self.value);
     auto byvotes = registered_candidates.get_index<"byvotesrank"_n>();
     auto cand_itr = byvotes.begin();
 
     int32_t electcount = configs().numelected;
-    uint8_t currentCustodianCount = 0;
+    uint8_t currentAuditorCount = 0;
 
     if (!early_election) {
         eosio::print("Empty the auditors table to get a full set of new auditors based on the current votes.");
-        auto cust_itr = custodians.begin();
-        while (cust_itr != custodians.end()) {
+        auto cust_itr = auditors.begin();
+        while (cust_itr != auditors.end()) {
             const auto &reg_candidate = registered_candidates.get(cust_itr->cust_name.value, "ERR::NEWTENURE_EXPECTED_CAND_NOT_FOUND::Corrupt data: Trying to set a lockup delay on candidate leaving office.");
             registered_candidates.modify(reg_candidate, cust_itr->cust_name, [&](candidate &c) {
                 eosio::print("Lockup stake for release delay.");
                 c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
             });
-            cust_itr = custodians.erase(cust_itr);
+            cust_itr = auditors.erase(cust_itr);
         }
     }
 
     eosio::print("Select only enough candidates to fill the gaps.");
-    for (auto itr = custodians.begin(); itr != custodians.end(); itr++) { ++currentCustodianCount; }
+    for (auto itr = auditors.begin(); itr != auditors.end(); itr++) { ++currentAuditorCount; }
 
-    while (currentCustodianCount < electcount) {
+    while (currentAuditorCount < electcount) {
         if (cand_itr == byvotes.end() || cand_itr->total_votes == 0) {
             eosio::print("The pool of eligible candidates has been exhausted");
             return;
         }
 
-        //  If the candidate is inactive or is already a custodian skip to the next one.
-        if (!cand_itr->is_active || custodians.find(cand_itr->candidate_name.value) != custodians.end()) {
+        //  If the candidate is inactive or is already a auditor skip to the next one.
+        if (!cand_itr->is_active || auditors.find(cand_itr->candidate_name.value) != auditors.end()) {
             cand_itr++;
         } else {
-            custodians.emplace(_self, [&](custodian &c) {
+            auditors.emplace(_self, [&](auditor &c) {
                 c.cust_name = cand_itr->candidate_name;
                 c.total_votes = cand_itr->total_votes;
             });
@@ -52,7 +52,7 @@ void auditorbos::allocateAuditors(bool early_election) {
                     c.auditor_end_time_stamp = time_point_sec(now() + configs().lockup_release_time_delay);
             });
 
-            currentCustodianCount++;
+            currentAuditorCount++;
             cand_itr++;
         }
     }
@@ -60,13 +60,13 @@ void auditorbos::allocateAuditors(bool early_election) {
 
 void auditorbos::setAuditorAuths() {
 
-    custodians_table custodians(_self, _self.value);
+    auditors_table auditors(_self, _self.value);
 
     name accountToChange = configs().authaccount;
 
     vector<eosiosystem::permission_level_weight> accounts;
 
-    for (auto it = custodians.begin(); it != custodians.end(); it++) {
+    for (auto it = auditors.begin(); it != auditors.end(); it++) {
         eosiosystem::permission_level_weight account{
                 .permission = eosio::permission_level(it->cust_name, "active"_n),
                 .weight = (uint16_t) 1,
@@ -128,7 +128,7 @@ void auditorbos::newtenure(string message) {
     eosio_assert(percent_of_current_voter_engagement > config.vote_quorum_percent,
                  "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
 
-    // Set custodians for the next period.
+    // Set auditors for the next period.
     allocateAuditors(false);
 
     // Set the auths on the BOS auditor authority account

@@ -135,7 +135,7 @@ typedef multi_index<"candidates"_n, candidate,
  * - cust_name (name) - Account name of the auditor (INDEX)
  * - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.
  */
-struct [[eosio::table("custodians"), eosio::contract("auditorbos")]] custodian {
+struct [[eosio::table("auditors"), eosio::contract("auditorbos")]] auditor {
     name cust_name;
     uint64_t total_votes;
 
@@ -143,7 +143,7 @@ struct [[eosio::table("custodians"), eosio::contract("auditorbos")]] custodian {
 
     uint64_t by_votes_rank() const { return static_cast<uint64_t>(UINT64_MAX - total_votes); }
 
-    EOSLIB_SERIALIZE(custodian,
+    EOSLIB_SERIALIZE(auditor,
                      (cust_name)(total_votes))
 };
 
@@ -159,9 +159,9 @@ struct [[eosio::table("bios"), eosio::contract("auditorbos")]] bios {
 typedef multi_index<"bios"_n, bios > bios_table;
 
 
-typedef multi_index<"custodians"_n, custodian,
-        indexed_by<"byvotesrank"_n, const_mem_fun<custodian, uint64_t, &custodian::by_votes_rank> >
-> custodians_table;
+typedef multi_index<"auditors"_n, auditor,
+        indexed_by<"byvotesrank"_n, const_mem_fun<auditor, uint64_t, &auditor::by_votes_rank> >
+> auditors_table;
 
 /**
  * - voter (account_name) - The account name of the voter (INDEX)
@@ -284,7 +284,7 @@ public:
     ACTION nominatecand(name cand);
 
     /**
-     * This action is used to withdraw a candidate from being active for custodian elections.
+     * This action is used to withdraw a candidate from being active for auditor elections.
      *
      * ### Assertions:
      * - The account performing the action is authorised.
@@ -294,12 +294,12 @@ public:
      *
      *
      * ### Post Condition:
-     * The candidate should still be present in the candidates table and be set to inactive. If the were recently an elected custodian there may be a time delay on when they can unstake their tokens from the contract. If not they will be able to unstake their tokens immediately using the unstake action.
+     * The candidate should still be present in the candidates table and be set to inactive. If the were recently an elected auditor there may be a time delay on when they can unstake their tokens from the contract. If not they will be able to unstake their tokens immediately using the unstake action.
      */
     ACTION withdrawcand(name cand);
 
     /**
-     * This action is used to remove a candidate from being a candidate for custodian elections.
+     * This action is used to remove a candidate from being a candidate for auditor elections.
      *
      * ### Assertions:
      * - The action is authorised by the mid level permission the auth account for the contract.
@@ -315,11 +315,11 @@ public:
     ACTION firecand(name cand, bool lockupStake);
 
     /**
-     * This action is used to resign as a custodian.
+     * This action is used to resign as a auditor.
      *
      * ### Assertions:
      * - The `cust` account performing the action is authorised to do so.
-     * - The `cust` account is currently an elected custodian.
+     * - The `cust` account is currently an elected auditor.
      *
      * @param cust - The account id for the candidate nominating.
      *
@@ -435,7 +435,7 @@ private: // Private helper methods used by other actions.
 
     contr_config configs();
 
-    void updateVoteWeight(name custodian, int64_t weight);
+    void updateVoteWeight(name auditor, int64_t weight);
 
     void updateVoteWeights(const vector<name> &votes, int64_t vote_weight);
 

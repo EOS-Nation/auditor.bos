@@ -15,7 +15,7 @@ If an elected auditor resigns via the `withdrawcand` during a period a new candi
 - locked_tokens (asset) - An asset object representing the number of tokens locked when registering
 - total_votes (uint64) - Updated tally of the number of votes cast to a candidate. This is updated and used as part of the `newtenure` calculations. It is updated every time there is a vote change or a change of token balance for a voter for this candidate to facilitate live voting stats.
 
-### custodians
+### auditors
 
 - cust_name (name) - Account name of the auditor (INDEX)
 - total_votes - Tally of the number of votes cast to a auditor when they were elected in. This is updated as part of the `newtenure` action.

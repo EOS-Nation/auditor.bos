@@ -86,12 +86,12 @@ void auditorbos::firecust(name cust) {
 
 void auditorbos::removeAuditor(name cust) {
 
-    custodians_table custodians(_self, _self.value);
-    auto elected = custodians.find(cust.value);
-    eosio_assert(elected != custodians.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITORbos::The entered account name is not for a current custodian.");
+    auditors_table auditors(_self, _self.value);
+    auto elected = auditors.find(cust.value);
+    eosio_assert(elected != auditors.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current auditor.");
 
     eosio::print("Remove auditor from the auditors table.");
-    custodians.erase(elected);
+    auditors.erase(elected);
 
     // Remove the candidate from being eligible for the next election period.
     removeCandidate(cust, true);
