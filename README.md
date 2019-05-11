@@ -6,6 +6,52 @@ When an auditor registers, they need to provide their bio by calling the `update
 
 If an elected auditor resigns via the `withdrawcand` during a period a new candidate will be chosen to fill the gap on the auditor board from the votes ranking in the candidates at that moment.
 
+## Quickstart
+
+### Nominate Candidante
+
+> Must `eosio::transfer` BOS tokens at a minimum of `lockupasset` before submitting `nominatecand` action
+
+> Once candidate is nominated, BOS users can now vote for that candidate to become a BOS auditor.
+
+```
+$ eosc transfer <CANDIDATE> auditor.bos "100.0000 BOS" -m "stake for auditor.bos"
+$ eosc tx create auditor.bos nominatecand '{"cand": "<CANDIDATE>"}' -p <CANDIDATE>@active
+```
+
+### Withdraw Candidate & Unstake
+
+> A Candidate must `withdrawcand` to be allowed to `unstake` any BOS assets that was sent to `auditor.bos`.
+
+```
+$ eosc tx create auditor.bos withdrawcand '{"cand":"<CANDIDATE>"}' -p <CANDIDATE>
+$ eosc tx create auditor.bos unstake '{"cand":"<CANDIDATE>"}' -p <CANDIDATE>
+```
+
+### Start Auditor Tenure (Election)
+
+> `auditor.bos@auditors` permission will `updateauth` with candidates with the highest votes
+
+```bash
+$ eosc tx create auditor.bos newtenure '{"message":"newtenure for auditor.bos"}' -p auditor.bos@active
+```
+
+### Fire Auditor
+
+> Removes Auditor from `auditor.bos@auditors` authority
+
+```bash
+$ eosc tx create auditor.bos fireauditor '{"auditor": "<AUDITOR NAME>"}' -p auditor.bos@active
+```
+
+### Resign as Auditor
+
+> Removes Auditor from `auditor.bos@auditors` authority
+
+```bash
+$ eosc tx create auditor.bos resign '{"auditor": "<AUDITOR NAME>"}' -p <AUDITOR NAME>@active
+```
+
 ## Tables
 
 ### candidates
