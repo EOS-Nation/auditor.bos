@@ -1,5 +1,5 @@
 {
-  "threshold": 2,
+  "threshold": 1,
   "keys": [],
   "accounts": [{
       "permission": {
@@ -9,9 +9,5 @@
       "weight": 1
     }
   ],
-  "waits": [{
-      "wait_sec": 3600,
-      "weight": 1
-    }
-  ]
+  "waits": []
 }

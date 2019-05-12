@@ -344,12 +344,11 @@ The available compile time flags are:
 
 - TOKENCONTRACT (default = "eosio.token") - This is to set the associated token contract to inter-operate with for tracking voting weights, registered members and staking.
 - VOTING_DISABLED (default = false) - Setting this flag will disable the ability for anyone to vote for auditors by disabling the vote action.
-- TRANSFER_DELAY (default = 60 * 60) - for configuring the time delay on token transfers from the contract
 
 When put all together a compile command with all the bells and whistles might look like:
 
 ```bash
-eosio-cpp -DTOKENCONTRACT=eosio.token -DTRANSFER_DELAY=3600 -DVOTING_DISABLED -o auditor.wasm auditor.cpp
+eosio-cpp -DTOKENCONTRACT=eosio.token -DVOTING_DISABLED -o auditor.wasm auditor.cpp
 ```
 
 > **Note:** Since there are default values for the above flags they do not all need to be included to compile successfully.
