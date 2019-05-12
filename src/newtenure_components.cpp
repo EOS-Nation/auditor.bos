@@ -1,7 +1,7 @@
 void auditorbos::assertPeriodTime() {
     uint32_t timestamp = now();
     uint32_t periodBlockCount = timestamp - _currentState.lastperiodtime;
-    eosio_assert(periodBlockCount > configs().auditor_tenure,
+    check(periodBlockCount > configs().auditor_tenure,
                  "ERR::NEWTENURE_EARLY::New period is being called too soon. Wait until the period has completed.");
 }
 
@@ -120,12 +120,12 @@ void auditorbos::newtenure(string message) {
                  "% to allow new periods to trigger after initial activation.");
     eosio::print("\n\nPercent of current voter engagement: ", percent_of_current_voter_engagement, "\n\n");
 
-    eosio_assert(_currentState.met_initial_votes_threshold == true ||
+    check(_currentState.met_initial_votes_threshold == true ||
                  percent_of_current_voter_engagement > config.initial_vote_quorum_percent,
                  "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_ACTIVATE::Voter engagement is insufficient to activate the Audit Cycle..");
     _currentState.met_initial_votes_threshold = true;
 
-    eosio_assert(percent_of_current_voter_engagement > config.vote_quorum_percent,
+    check(percent_of_current_voter_engagement > config.vote_quorum_percent,
                  "ERR::NEWTENURE_VOTER_ENGAGEMENT_LOW_PROCESS::Voter engagement is insufficient to process a new period");
 
     // Set auditors for the next period.

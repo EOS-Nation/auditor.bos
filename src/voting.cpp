@@ -1,17 +1,17 @@
 
 void auditorbos::voteauditor(name voter, vector<name> newvotes) {
 #ifdef VOTING_DISABLED
-    eosio_assert(false,"ERR::VOTEAUDITOR_VOTING_IS_DISABLED::Voting is currently disabled.");
+    check(false,"ERR::VOTEAUDITOR_VOTING_IS_DISABLED::Voting is currently disabled.");
 #endif
 
     require_auth(voter);
 
-    eosio_assert(newvotes.size() <= configs().maxvotes, "ERR::VOTEAUDITOR_MAX_VOTES_EXCEEDED::Max number of allowed votes was exceeded.");
+    check(newvotes.size() <= configs().maxvotes, "ERR::VOTEAUDITOR_MAX_VOTES_EXCEEDED::Max number of allowed votes was exceeded.");
     std::set<name> dupSet{};
     for (name vote: newvotes) {
-        eosio_assert(dupSet.insert(vote).second, "ERR::VOTEAUDITOR_DUPLICATE_VOTES::Added duplicate votes for the same candidate.");
+        check(dupSet.insert(vote).second, "ERR::VOTEAUDITOR_DUPLICATE_VOTES::Added duplicate votes for the same candidate.");
         auto candidate = registered_candidates.get(vote.value, "ERR::VOTEAUDITOR_CANDIDATE_NOT_FOUND::Candidate could not be found.");
-        eosio_assert(candidate.is_active, "ERR::VOTEAUDITOR_VOTING_FOR_INACTIVE_CAND::Attempting to vote for an inactive candidate.");
+        check(candidate.is_active, "ERR::VOTEAUDITOR_VOTING_FOR_INACTIVE_CAND::Attempting to vote for an inactive candidate.");
     }
 
     modifyVoteWeights(voter, newvotes);

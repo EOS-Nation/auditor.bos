@@ -10,7 +10,7 @@ void auditorbos::nominatecand(name cand) {
 
     auto reg_candidate = registered_candidates.find(cand.value);
     if (reg_candidate != registered_candidates.end()) {
-        eosio_assert(!reg_candidate->is_active, "ERR::NOMINATECAND_ALREADY_REGISTERED::Candidate is already registered and active.");
+        check(!reg_candidate->is_active, "ERR::NOMINATECAND_ALREADY_REGISTERED::Candidate is already registered and active.");
         registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
             c.is_active = 1;
 
@@ -18,10 +18,10 @@ void auditorbos::nominatecand(name cand) {
                 c.locked_tokens += pending->quantity;
                 pendingstake.erase(pending);
             }
-            eosio_assert(c.locked_tokens >= configs().lockupasset, "ERR::NOMINATECAND_INSUFFICIENT_FUNDS_TO_STAKE::Insufficient funds have been staked.");
+            check(c.locked_tokens >= configs().lockupasset, "ERR::NOMINATECAND_INSUFFICIENT_FUNDS_TO_STAKE::Insufficient funds have been staked.");
         });
     } else {
-        eosio_assert(pending != pendingstake.end() &&
+        check(pending != pendingstake.end() &&
                      pending->quantity >= configs().lockupasset,
                      "ERR::NOMINATECAND_STAKING_FUNDS_INCOMPLETE::A registering candidate must transfer sufficient tokens to the contract for staking.");
 
@@ -47,9 +47,9 @@ void auditorbos::firecand(name cand, bool lockupStake) {
 
 void auditorbos::unstake(name cand) {
     const auto &reg_candidate = registered_candidates.get(cand.value, "ERR::UNSTAKE_CAND_NOT_REGISTERED::Candidate is not already registered.");
-    eosio_assert(!reg_candidate.is_active, "ERR::UNSTAKE_CANNOT_UNSTAKE_FROM_ACTIVE_CAND::Cannot unstake tokens for an active candidate. Call withdrawcand first.");
+    check(!reg_candidate.is_active, "ERR::UNSTAKE_CANNOT_UNSTAKE_FROM_ACTIVE_CAND::Cannot unstake tokens for an active candidate. Call withdrawcand first.");
 
-    eosio_assert(reg_candidate.auditor_end_time_stamp < time_point_sec(now()), "ERR::UNSTAKE_CANNOT_UNSTAKE_UNDER_TIME_LOCK::Cannot unstake tokens before they are unlocked from the time delay.");
+    check(reg_candidate.auditor_end_time_stamp < time_point_sec(now()), "ERR::UNSTAKE_CANNOT_UNSTAKE_UNDER_TIME_LOCK::Cannot unstake tokens before they are unlocked from the time delay.");
 
     registered_candidates.modify(reg_candidate, cand, [&](candidate &c) {
         // Ensure the candidate's tokens are not locked up for a time delay period.
@@ -82,7 +82,7 @@ void auditorbos::removeAuditor(name auditor) {
 
     auditors_table auditors(_self, _self.value);
     auto elected = auditors.find(auditor.value);
-    eosio_assert(elected != auditors.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current auditor.");
+    check(elected != auditors.end(), "ERR::REMOVEAUDITOR_NOT_CURRENT_AUDITOR::The entered account name is not for a current auditor.");
 
     eosio::print("Remove auditor from the auditors table.");
     auditors.erase(elected);
