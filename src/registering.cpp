@@ -56,7 +56,7 @@ void auditorbos::unstake(name cand) {
         // Send back the locked up tokens
         // inline transfer unstaking
         eosio::action(
-                eosio::permission_level{_self , "xfer"_n },
+                eosio::permission_level{_self , "active"_n },
                 name( TOKEN_CONTRACT ),
                 "transfer"_n,
                 make_tuple( _self, cand, c.locked_tokens, string("Returning locked up stake. Thank you."))
