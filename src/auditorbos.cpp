@@ -6,7 +6,7 @@
 #include <eosiolib/multi_index.hpp>
 #include <eosiolib/public_key.hpp>
 #include <string>
-#include "auditorbos/auditorbos.hpp"
+#include "auditorbos.hpp"
 
 #include "update_member_details.cpp"
 #include "registering.cpp"
